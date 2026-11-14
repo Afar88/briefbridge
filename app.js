@@ -71,12 +71,19 @@ export function briefToMarkdown(input = {}) {
 function readSaved() {
   try {
     const value = JSON.parse(localStorage.getItem(STORE_KEY) || "[]");
-    return Array.isArray(value) ? value : [];
+    return Array.isArray(value)
+      ? value.filter(item => item && typeof item.id === "string" && item.brief && typeof item.brief === "object").slice(0, 50)
+      : [];
   } catch { return []; }
 }
 
 function writeSaved(items) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(items));
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(items));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function makeId() {
@@ -118,7 +125,9 @@ export class App {
       const items = readSaved();
       const record = { id: makeId(), createdAt: new Date().toISOString(), brief: checked.brief };
       items.unshift(record);
-      writeSaved(items.slice(0, 50));
+      if (!writeSaved(items.slice(0, 50))) {
+        return { ok: false, reason: "This browser could not save the brief. Check available storage and try again." };
+      }
       window.dispatchEvent(new CustomEvent("briefbridge:saved", { detail: record }));
       return { ok: true, id: record.id, title: record.brief.title, createdAt: record.createdAt };
     },
@@ -129,7 +138,9 @@ export class App {
     deleteBrief(id) {
       const check = this.checkDeleteBrief(id);
       if (!check.ok) return { ok: false, reason: check.reason };
-      writeSaved(readSaved().filter(item => item.id !== id));
+      if (!writeSaved(readSaved().filter(item => item.id !== id))) {
+        return { ok: false, reason: "This browser could not update its saved library. Try again." };
+      }
       window.dispatchEvent(new CustomEvent("briefbridge:deleted", { detail: { id } }));
       return { ok: true, deleted: id, title: check.title };
     },
@@ -149,6 +160,15 @@ function setFormValues(brief) {
 function readFormBrief() {
   const data = currentFormData();
   return normalizeBrief(data);
+}
+
+function persistDraft(brief = readFormBrief()) {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(brief));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function renderPreview(brief) {
@@ -223,7 +243,7 @@ function init() {
 
   form.addEventListener("input", () => {
     const draft = readFormBrief();
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    persistDraft(draft);
     renderPreview(draft);
   });
   form.addEventListener("submit", event => {
@@ -254,7 +274,11 @@ function init() {
     const remove = event.target.closest("[data-delete-brief]");
     if (open) {
       const item = App.page.getBrief(open.dataset.openBrief);
-      if (item) { setFormValues(item.brief); renderPreview(item.brief); }
+      if (item) {
+        setFormValues(item.brief);
+        persistDraft(item.brief);
+        renderPreview(item.brief);
+      }
     }
     if (remove) {
       const item = App.page.getBrief(remove.dataset.deleteBrief);
@@ -282,7 +306,9 @@ function init() {
       openQuestions: ["Which channels are highest priority?", "Is paid media included?"],
       nextSteps: ["Confirm deliverables", "Agree budget and milestones", "Schedule kickoff"],
     });
-    renderPreview(readFormBrief());
+    const example = readFormBrief();
+    persistDraft(example);
+    renderPreview(example);
   });
 }
 
