@@ -110,6 +110,39 @@ test("refuses to silently discard saved briefs when the library is full", () => 
   }
 });
 
+test("rejects oversized list input instead of silently truncating it", () => {
+  const result = validateBrief({
+    title: "Campaign",
+    objective: "Objective",
+    audience: "Audience",
+    deliverables: Array.from({ length: 13 }, (_, index) => `Deliverable ${index + 1}`),
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /at most 12 items/);
+});
+
+test("rejects overlong imported brief fields instead of silently truncating them", () => {
+  const result = parseBriefJson({
+    title: "A".repeat(121),
+    objective: "Objective",
+    audience: "Audience",
+    deliverables: ["Deliverable"],
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /120 characters or fewer/);
+});
+
+test("rejects overlong individual list entries", () => {
+  const result = validateBrief({
+    title: "Campaign",
+    objective: "Objective",
+    audience: "Audience",
+    deliverables: ["D".repeat(221)],
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.reason, /220 characters or fewer/);
+});
+
 test("uses a safe project type when none is supplied", () => {
   assert.equal(normalizeBrief({ title: "Test" }).projectType, "Other");
 });
