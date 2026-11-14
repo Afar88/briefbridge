@@ -67,7 +67,7 @@ BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the 
 
 BriefBridge is a static site; it does not need a server process, database, or runtime secrets. The repository's `render.yaml` is the deployment blueprint.
 
-The Render static site is already provisioned at **https://briefbridge-bpxd.onrender.com** from `build/complete-mozilla-otari`; it is separate from `main` and the draft PR remains unmerged. The latest deployment is live on commit `57eb8a1bc18fec87b22271c22114821b706680f9`. To recreate it in another Render workspace:
+The Render static site is already provisioned at **https://briefbridge-bpxd.onrender.com** from `build/complete-mozilla-otari`; it is separate from `main` and the draft PR remains unmerged. The latest deployment is live from this feature branch; use the Render deploy history for the exact source commit. To recreate it in another Render workspace:
 
 1. Connect the GitHub repository `Afar88/briefbridge` to Render.
 2. Create a new **Blueprint** and select this repository.
