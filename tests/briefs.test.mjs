@@ -143,6 +143,14 @@ test("rejects overlong individual list entries", () => {
   assert.match(result.reason, /220 characters or fewer/);
 });
 
+test("handles non-object validation input without crashing", () => {
+  for (const value of [null, [], "not a brief", 42]) {
+    const result = validateBrief(value);
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /project title/);
+  }
+});
+
 test("uses a safe project type when none is supplied", () => {
   assert.equal(normalizeBrief({ title: "Test" }).projectType, "Other");
 });
