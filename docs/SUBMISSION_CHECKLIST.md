@@ -15,9 +15,10 @@
 - [ ] A visitor can run the coordinator and specialist agents with a real Otari key (authenticated inference not yet tested).
 - [ ] Agent-driven save and delete actions require human confirmation.
 - [x] Public CORS response headers are present on discovery resources (automated cross-origin Origin-header check).
-- [x] Otari browser preflight allows this origin, POST, Authorization and Content-Type (GitHub Actions run #42).\n- [ ] Verify an actual browser fetch from a separate origin.
-- [x] `npm run check` passes on the latest branch commit (6 tests passed; 0 failed).
-- [x] Live endpoint smoke test passed: 14 checks, 0 failures, 0 warnings (GitHub Actions run #42).
+- [x] Otari browser preflight allows this origin, POST, Authorization and Content-Type (GitHub Actions run #62).
+- [ ] Verify an actual browser fetch from a separate origin.
+- [x] `npm run check` passes on the latest branch commit (8 tests passed; 0 failed).
+- [x] Live endpoint smoke test passed: 16 checks, 0 failures, 0 warnings (GitHub Actions run #62).
 - [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
 - [ ] Export a brief as JSON, import it again, verify the editor fields, and save the reviewed copy.
