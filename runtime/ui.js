@@ -1108,13 +1108,18 @@ export function mountApp(root, { engine, trace, manifest }) {
         modelSelectEl.appendChild(option);
       }
       const current = normalizeModelName(modelEl.value);
-      if (current && models.includes(current)) modelSelectEl.value = current;
-      else if (models.length) {
-        modelSelectEl.value = models[0];
-        modelEl.value = models[0];
+      if (current && models.includes(current)) {
+        modelSelectEl.value = current;
+      } else {
+        // A model catalogue is not a compatibility or billing guarantee. Never
+        // silently replace the configured model with the first arbitrary entry:
+        // gateways may publish models that cannot be metered for chat completion.
+        modelSelectEl.value = "";
       }
       setProfileHint(models.length
-        ? `Loaded ${models.length} models from your provider. Choose one from the list.`
+        ? (current && models.includes(current)
+          ? `Loaded ${models.length} models. Current model is listed; confirm it supports chat completions and your provider's billing rules.`
+          : `Loaded ${models.length} models. Your current model was kept unchanged. Choose a chat-completion model you know is supported and billable; catalogue order is not a recommendation.`)
         : "Your provider returned an empty model list. You can enter a model ID manually.");
       return models;
     } catch {
