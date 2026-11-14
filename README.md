@@ -10,7 +10,7 @@ BriefBridge is a browser-first open agentic website built for the Open Agentic W
 - Uses a coordinator agent and a brief-architecture specialist to clarify vague requests and shape a useful scope.
 - Separates confirmed facts from assumptions and unanswered questions.
 - Saves briefs in the visitor's browser only after an explicit confirmation.
-- Exports a brief as Markdown or JSON.
+- Exports a brief as Markdown or JSON, and imports previously exported JSON briefs for review and reuse.
 - Publishes a portable agent network that other conforming agentic websites can discover and call.
 
 ## Try it locally
