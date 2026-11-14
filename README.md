@@ -61,7 +61,8 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 - US-region router: `https://api.otari.ai/api/v1`
 - EU-region router: `https://eu.api.otari.ai/api/v1`
 - Default model: `alibaba/qwen3.5-397b-a17b` (shown in the Otari available-model list).
-- Choose a model that supports chat completions and tool calls.
+- BriefBridge reads Otari's model catalogue and automatically selects a model explicitly marked as a priced chat model with both `tools` and `tool_choice` support. It keeps the configured preference when eligible; otherwise it chooses the lowest-priced eligible model.
+- If Otari does not expose enough catalogue metadata to verify a suitable model, BriefBridge does not guess; the visitor can choose a verified model manually in advanced settings.
 - The visitor can change the model or provider in the runtime's advanced settings.
 - Model usage may incur charges on the visitor's Otari account; use a key with a suitable budget and model restrictions.
 
