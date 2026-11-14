@@ -45,7 +45,35 @@ async function check(path, { json = false, cors = false, includes = "", retries 
   return null;
 }
 
+async function checkOtariPreflight() {
+  const started = Date.now();
+  try {
+    const response = await fetch("https://api.otari.ai/v1/chat/completions", {
+      method: "OPTIONS",
+      headers: {
+        Origin: base,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "authorization,content-type",
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    const allowOrigin = response.headers.get("access-control-allow-origin") || "";
+    const allowMethods = (response.headers.get("access-control-allow-methods") || "").toLowerCase();
+    const allowHeaders = (response.headers.get("access-control-allow-headers") || "").toLowerCase();
+    if (!response.ok) throw new Error(`preflight returned HTTP ${response.status}`);
+    if (allowOrigin !== "*" && allowOrigin !== base) throw new Error(`preflight did not allow origin ${base}`);
+    if (!allowMethods.includes("post")) throw new Error("preflight does not allow POST");
+    if (!allowHeaders.includes("authorization") || !allowHeaders.includes("content-type")) {
+      throw new Error("preflight does not allow Authorization and Content-Type headers");
+    }
+    passed.push({ path: "Otari browser preflight", elapsedMs: Date.now() - started });
+  } catch (error) {
+    failures.push({ path: "Otari browser preflight", error: error.message });
+  }
+}
+
 console.log(`BriefBridge live smoke test: ${base}`);
+await checkOtariPreflight();
 
 await check("/", { includes: "BriefBridge" });
 const manifest = await check("/agent-manifest.json", { json: true, cors: true });
