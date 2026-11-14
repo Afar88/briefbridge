@@ -8,6 +8,7 @@ const lines = (value, maxItems = 12) => {
 };
 
 export function normalizeBrief(input = {}) {
+  input = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   return {
     title: text(input.title, 120),
     client: text(input.client, 120),
@@ -43,6 +44,7 @@ export function parseBriefJson(input) {
 }
 
 function validateInputLimits(input = {}) {
+  input = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const scalarLimits = {
     title: 120, client: 120, projectType: 60, objective: 1600,
     audience: 800, scope: 1600, timeline: 240, budget: 160,
