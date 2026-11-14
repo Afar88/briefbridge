@@ -10,7 +10,7 @@
     ]
   },
   "llm_config": {
-    "model_name": "nebius:moonshotai/Kimi-K2.6"
+    "model_name": "mzai:moonshotai/Kimi-K2.6"
   },
   "max_steps": 10,
   "cruse": {
