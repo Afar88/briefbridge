@@ -39,13 +39,16 @@ for (const name of manifest.actions?.agentTools || []) {
 }
 const renderConfig = await readFile(resolve(root, "render.yaml"), "utf8");
 for (const [label, pattern] of [
-  ["free static hosting", /runtime:\s*static[\s\S]*?plan:\s*free/],
+  ["static hosting runtime", /runtime:\s*static/],
   ["current review branch", /branch:\s*build\/complete-mozilla-otari/],
   ["validation build", /buildCommand:\s*npm install && npm run check/],
   ["repository-root publish", /staticPublishPath:\s*\./],
   ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/]
 ]) {
   if (!pattern.test(renderConfig)) fail("Render must configure " + label + ".");
+}
+if (/^\s+plan:/m.test(renderConfig)) {
+  fail("Render static sites use the platform's default static-site plan; do not set a service plan.");
 }
 const renderHeaderBlock = path => {
   const marker = "      - path: " + path;
