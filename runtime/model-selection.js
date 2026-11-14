@@ -1,6 +1,11 @@
 // Select only models Otari identifies as priced chat models with function-tool support.
+// Speech/TTS models can expose chat-like metadata while using character-based billing,
+// which the completion meter cannot charge. Keep them out of the chat selector.
+const NON_COMPLETION_MODEL_ID = /(?:^|[\\/_-])(tts|text-to-speech|speech|audio)(?:$|[\\/_-])/i;
+
 export function isSuitableChatModel(model) {
   if (!model || typeof model !== "object") return false;
+  if (typeof model.id !== "string" || NON_COMPLETION_MODEL_ID.test(model.id)) return false;
   if (model.type !== "chat") return false;
   if (!Array.isArray(model.supported_parameters)) return false;
   if (!model.supported_parameters.includes("tools") || !model.supported_parameters.includes("tool_choice")) return false;
