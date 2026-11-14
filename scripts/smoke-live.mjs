@@ -108,6 +108,12 @@ if (network && alias && JSON.stringify(network) !== JSON.stringify(alias)) {
 if (manifest && manifest.llm_router?.mock !== false) {
   failures.push({ path: "/agent-manifest.json", error: "live network must not be configured for mock mode" });
 }
+if (manifest && manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") {
+  failures.push({ path: "/agent-manifest.json", error: "default Otari router base URL is not the current hosted OpenAI-compatible endpoint" });
+}
+if (network && network.llm_config?.model_name !== "nebius:moonshotai/Kimi-K2.6") {
+  failures.push({ path: "/briefbridge_network.network.json", error: "network model selector is not the current Otari Nebius selector" });
+}
 
 try {
   const { response } = await request("/runtime/sandbox-worker.js");
