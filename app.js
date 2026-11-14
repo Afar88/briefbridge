@@ -42,8 +42,36 @@ export function parseBriefJson(input) {
   return { ok: true, brief: checked.brief };
 }
 
+function validateInputLimits(input = {}) {
+  const scalarLimits = {
+    title: 120, client: 120, projectType: 60, objective: 1600,
+    audience: 800, scope: 1600, timeline: 240, budget: 160,
+  };
+  for (const [field, limit] of Object.entries(scalarLimits)) {
+    const value = input[field];
+    if (value != null && String(value).length > limit) {
+      return `${field} must be ${limit} characters or fewer. Shorten it before saving or importing.`;
+    }
+  }
+  const listFields = ["deliverables", "constraints", "assumptions", "openQuestions", "nextSteps"];
+  for (const field of listFields) {
+    const value = input[field];
+    const items = Array.isArray(value) ? value : String(value ?? "").split(/\\r?\\n/);
+    const nonEmpty = items.map(item => String(item ?? "").trim()).filter(Boolean);
+    if (nonEmpty.length > 12) {
+      return `${field} can contain at most 12 items. Remove or combine items before saving or importing.`;
+    }
+    if (nonEmpty.some(item => item.length > 220)) {
+      return `Each ${field} item must be 220 characters or fewer. Shorten the long item before saving or importing.`;
+    }
+  }
+  return "";
+}
+
 export function validateBrief(input = {}) {
   const brief = normalizeBrief(input);
+  const limitIssue = validateInputLimits(input);
+  if (limitIssue) return { ok: false, brief, reason: limitIssue };
   const missing = [];
   if (!brief.title) missing.push("a project title");
   if (!brief.objective) missing.push("the project objective");
