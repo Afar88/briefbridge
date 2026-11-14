@@ -14,7 +14,9 @@
 - [ ] Save and delete actions require human confirmation.
 - [x] Public CORS response headers are present on discovery resources (automated cross-origin Origin-header check).
 - [ ] Verify an actual browser fetch from a separate origin.
-- [x] `npm run check` passes on the deployed commit (6 tests passed; 0 failed).\n- [x] Live endpoint smoke test passed: 11 checks, 0 failures (GitHub Actions run #3).\n- [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
+- [x] `npm run check` passes on the latest branch commit (6 tests passed; 0 failed).
+- [x] Live endpoint smoke test passed: 11 checks, 0 failures (GitHub Actions run #10).
+- [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
 
 ## Submission materials
