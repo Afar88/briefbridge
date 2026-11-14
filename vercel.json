@@ -77,5 +77,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/briefbridge_network",
+      "destination": "/briefbridge_network.network.json"
+    }
   ]
 }
