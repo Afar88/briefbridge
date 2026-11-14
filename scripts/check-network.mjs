@@ -34,6 +34,24 @@ for (const agent of network.config.tools || []) {
 }
 const front = agents.get(entry?.front_man);
 if (!front?.tools?.includes("brief_architect")) fail("The coordinator must be able to delegate to brief_architect.");
+const specialist = agents.get("brief_architect");
+const delegation = network.classifyTool("brief_architect");
+if (delegation.kind !== "agent" || delegation.spec !== specialist) {
+  fail("brief_architect must resolve as a local agent tool, not a missing, remote or plain text reference.");
+}
+if (!specialist?.function?.parameters?.required?.includes("request")) {
+  fail("brief_architect must accept the coordinator's project context through a required request argument.");
+}
+if (!specialist?.instructions?.includes("Do not ask the visitor questions directly")) {
+  fail("brief_architect must return clarification questions to the coordinator rather than addressing the visitor directly.");
+}
+if (!specialist?.instructions?.includes("assumptions") || !specialist?.instructions?.includes("open questions")) {
+  fail("brief_architect must explicitly identify assumptions and open questions.");
+}
+const runnerSource = await readFile(resolve(root, "runtime/runner.js"), "utf8");
+if (!/if \(entry\.kind === "agent"\)\s*\{\s*const result = await runAgent\(ctx, entry\.ref/.test(runnerSource)) {
+  fail("The browser runtime must execute local agent tools through runAgent.");
+}
 for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
