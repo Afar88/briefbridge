@@ -20,6 +20,7 @@
 - [x] Live endpoint smoke test passed: 14 checks, 0 failures, 0 warnings (GitHub Actions run #42).
 - [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
+- [ ] Export a brief as JSON, import it again, verify the editor fields, and save the reviewed copy.
 
 ## Submission materials
 
