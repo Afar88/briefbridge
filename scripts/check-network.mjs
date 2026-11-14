@@ -45,10 +45,10 @@ for (const [label, pattern] of [
   ["repository-root publish", /staticPublishPath:\s*\./],
   ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/]
 ]) {
-  if (!pattern.test(renderConfig)) fail(\`Render must configure \${label}.\`);
+  if (!pattern.test(renderConfig)) fail("Render must configure " + label + ".");
 }
 const renderHeaderBlock = path => {
-  const marker = \`      - path: \${path}\`;
+  const marker = "      - path: " + path;
   const index = renderConfig.indexOf(marker);
   if (index < 0) return "";
   const next = renderConfig.indexOf("\n      - path:", index + marker.length);
@@ -56,7 +56,7 @@ const renderHeaderBlock = path => {
 };
 const hasRenderHeader = (path, name, value) => {
   const block = renderHeaderBlock(path);
-  return block.includes(\`name: \${name}\`) && block.includes(\`value: \${value}\`);
+  return block.includes("name: " + name) && block.includes("value: " + value);
 };
 for (const path of [
   "/agent-manifest.json",
@@ -66,14 +66,14 @@ for (const path of [
   "/.well-known/nsdeploy.json",
   "/.well-known/nsdeploy-agent.json"
 ]) {
-  if (!hasRenderHeader(path, "Access-Control-Allow-Origin", '"*"')) {
-    fail(\`Render must allow public CORS for \${path}.\`);
+  if (!hasRenderHeader(path, "Access-Control-Allow-Origin", "\"*\"")) {
+    fail("Render must allow public CORS for " + path + ".");
   }
 }
 if (!hasRenderHeader("/*", "X-Content-Type-Options", "nosniff")) {
   fail("Render must apply X-Content-Type-Options globally.");
 }
-if (!hasRenderHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", '"default-src')) {
+if (!hasRenderHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "\"default-src")) {
   fail("Render must apply the restrictive sandbox-worker CSP.");
 }
 const vercelConfig = await readJson("vercel.json");
