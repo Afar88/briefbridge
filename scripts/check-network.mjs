@@ -38,6 +38,10 @@ for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
 const vercelConfig = await readJson("vercel.json");
+const hasNetworkRewrite = (vercelConfig.rewrites || []).some(rule =>
+  rule.source === "/briefbridge_network" && rule.destination === "/briefbridge_network.network.json"
+);
+if (!hasNetworkRewrite) fail("Vercel must resolve /briefbridge_network to the published network JSON.");
 const headerRules = vercelConfig.headers || [];
 const hasHeader = (source, key, value) => headerRules.some(rule =>
   rule.source === source && rule.headers?.some(header => header.key === key && header.value === value)
