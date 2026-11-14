@@ -10,7 +10,7 @@
     ]
   },
   "llm_config": {
-    "model_name": "mzai:moonshotai/Kimi-K2.6"
+    "model_name": "alibaba/qwen3.5-397b-a17b"
   },
   "max_steps": 10,
   "cruse": {

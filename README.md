@@ -32,7 +32,7 @@ The brief builder works without an AI key. To use the agents:
 
 1. Create an account at [otari.ai](https://otari.ai) and create an API key.
 2. Open **AI model settings** in the assistant.
-3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `mzai:moonshotai/Kimi-K2.6`. For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
+3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `alibaba/qwen3.5-397b-a17b` (a model shown in Otari's available-model list). For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
 4. Select **Save and start**, then describe a project request.
 
 Do not paste API keys into GitHub, project files, screenshots or chat messages. The reference runtime keeps the BYOK setup in this browser and sends the key only to the configured router. Your messages and any page data the agents read are sent to the model provider you select. To clear the saved setup, use **Delete setup** in the AI model settings, then close the tab.
@@ -60,7 +60,7 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 
 - US-region router: `https://api.otari.ai/api/v1`
 - EU-region router: `https://eu.api.otari.ai/api/v1`
-- Default managed model: `mzai:moonshotai/Kimi-K2.6`
+- Default model: `alibaba/qwen3.5-397b-a17b` (shown in the Otari available-model list).
 - Choose a model that supports chat completions and tool calls.
 - The visitor can change the model or provider in the runtime's advanced settings.
 - Model usage may incur charges on the visitor's Otari account; use a key with a suitable budget and model restrictions.
@@ -71,7 +71,7 @@ BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the 
 
 BriefBridge is a static site; it does not need a server process, database, or runtime secrets. The repository's `render.yaml` is the deployment blueprint.
 
-The Render static site is provisioned at **https://briefbridge-bpxd.onrender.com** and configured to auto-deploy from `build/complete-mozilla-otari`; it is separate from `main` and the draft PR remains unmerged. Render's deployment history is the source of truth for the exact live revision. After every release, confirm that the live deploy's commit SHA matches the intended branch head before treating the new code as public. To recreate it in another Render workspace:
+The Render static site is provisioned at **https://briefbridge-bpxd.onrender.com** and configured to auto-deploy from the `main` branch. Render's deployment history is the source of truth for the exact live revision. After every release, confirm that the live deploy's commit SHA matches the intended branch head before treating the new code as public. To recreate it in another Render workspace:
 
 1. Connect the GitHub repository `Afar88/briefbridge` to Render.
 2. Create a new **Blueprint** and select this repository.

@@ -2,7 +2,7 @@ services:
   - type: web
     name: briefbridge
     runtime: static
-    branch: build/complete-mozilla-otari
+    branch: main
     autoDeploy: true
     buildCommand: npm install && npm run check
     staticPublishPath: .
