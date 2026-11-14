@@ -1,0 +1,81 @@
+{
+  "brand": "BriefBridge — Project Brief Assistant",
+  "networks": [
+    {
+      "name": "briefbridge_network",
+      "front_man": "briefbridge_coordinator",
+      "hocon": "./briefbridge_network.network.json",
+      "description": "Clarify a project request, shape its scope and prepare a brief you can review and save.",
+      "tags": [
+        "open-agentic-website",
+        "project-intake",
+        "brief-writing",
+        "mozilla-otari"
+      ],
+      "sample_queries": [
+        "Help me turn this rough idea into a project brief.",
+        "Ask me the missing questions before defining the scope.",
+        "Create a brief for a small business website redesign.",
+        "Save the completed brief to my BriefBridge library."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "BriefBridge publishes a callable network and does not contact third-party agent sites by default."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "briefbridge_network",
+    "front_man": "briefbridge_coordinator",
+    "available": false,
+    "reason": "The public network is browser-callable through the Open Agentic Web manifest. This static deployment does not run a separate MCP server."
+  },
+  "theme": {
+    "primary": "#385b25"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "briefbridge_network",
+        "front_man": "briefbridge_coordinator",
+        "aliases": [
+          "briefbridge_network",
+          "briefbridge_coordinator",
+          "BriefBridge"
+        ],
+        "url": "briefbridge_network"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  },
+  "actions": {
+    "version": 1,
+    "module": "./site-actions.js",
+    "bridge": "./bridge/action-bridge.html",
+    "agentTools": [
+      "get_workspace_state",
+      "save_brief",
+      "delete_brief"
+    ]
+  }
+}

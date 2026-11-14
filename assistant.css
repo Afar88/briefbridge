@@ -1,0 +1,24 @@
+/* BriefBridge theme adjustments for the official nsdeploy browser runtime. */
+#agent-app{--ns-font:"DM Sans",system-ui,sans-serif;--ns-bg:#172337;--ns-fg:#e9eff7;--ns-primary:#385b25;--ns-accent:#385b25;--ns-border:rgba(196,211,231,.16);--ns-panelbg:#172337;--ns-msgbg:#20324a;--ns-muted:#9aaabd;color-scheme:dark}
+#agent-app .ns-chat{background:var(--ns-bg);border:1px solid var(--ns-border);border-radius:14px;overflow:hidden}
+#agent-app .ns-header{border-bottom:1px solid var(--ns-border);flex-wrap:wrap}
+#agent-app input,#agent-app textarea,#agent-app select{background:#101a2a;color:#eef3f8;border-color:var(--ns-border)}
+#agent-app button{margin:0;font-family:inherit}
+#agent-app input[type=checkbox],#agent-app input[type=radio]{width:auto}
+#agent-app .ns-settings-body label,#agent-app .ns-widget label{margin:4px 0;font-weight:400}
+#agent-app .ns-w-choice{color:#eef3f8}
+#agent-app .ns-msg{overflow-wrap:anywhere}
+#agent-app .ns-consent{background:#fffbeb;color:#202020}
+#agent-app .ns-consent-actions{flex-wrap:wrap}
+#agent-app .ns-consent-actions button{white-space:nowrap}
+#agent-app .ns-msgs:has(.ns-consent-actions)>.ns-turn-status{display:none}
+.assistant-panels{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px;margin-top:12px}
+#agent-app.ns-composed-app [data-ns-slot=chat]{height:650px}
+body>dialog h2{margin:0 0 12px;font:700 1.2em Manrope,system-ui,sans-serif}
+body>dialog button{margin-right:8px}
+.assistant-review{max-width:620px;width:85%;max-height:85vh;overflow:auto;border:1px solid #72849a;border-radius:14px;padding:24px;background:#f8fafc;color:#152235;font:14px "DM Sans",system-ui,sans-serif}
+.assistant-review dl{display:grid;grid-template-columns:fit-content(35%) 1fr;gap:5px 15px;margin:15px 0}
+.assistant-review dt{font-weight:700}.assistant-review dd{margin:0;overflow-wrap:anywhere}
+.assistant-review pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.assistant-review .assistant-decline{background:transparent;color:inherit;border:1px solid currentColor}
+@media(max-width:760px){.assistant-panels{grid-template-columns:1fr}.assistant-review dl{grid-template-columns:1fr;gap:0}.assistant-review dd{margin-bottom:8px}}

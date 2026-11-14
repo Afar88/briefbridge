@@ -1,0 +1,19 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "briefbridge_network",
+      "front_man": "briefbridge_coordinator",
+      "aliases": [
+        "briefbridge_network",
+        "briefbridge_coordinator",
+        "BriefBridge"
+      ],
+      "url": "briefbridge_network"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

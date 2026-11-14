@@ -1,0 +1,10 @@
+{
+  "networks": [
+    {
+      "name": "briefbridge_network"
+    }
+  ],
+  "actions": {
+    "version": 1
+  }
+}

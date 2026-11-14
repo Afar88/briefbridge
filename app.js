@@ -1,0 +1,292 @@
+const STORE_KEY = "briefbridge.saved.v1";
+const DRAFT_KEY = "briefbridge.draft.v1";
+
+const text = (value, max = 1200) => String(value ?? "").trim().slice(0, max);
+const lines = (value, maxItems = 12) => {
+  const values = Array.isArray(value) ? value : String(value ?? "").split(/\n|,/);
+  return values.map(item => text(item, 220)).filter(Boolean).slice(0, maxItems);
+};
+
+export function normalizeBrief(input = {}) {
+  return {
+    title: text(input.title, 120),
+    client: text(input.client, 120),
+    projectType: text(input.projectType || "Other", 60),
+    objective: text(input.objective, 1600),
+    audience: text(input.audience, 800),
+    scope: text(input.scope, 1600),
+    deliverables: lines(input.deliverables),
+    constraints: lines(input.constraints),
+    timeline: text(input.timeline, 240),
+    budget: text(input.budget, 160),
+    assumptions: lines(input.assumptions),
+    openQuestions: lines(input.openQuestions),
+    nextSteps: lines(input.nextSteps),
+  };
+}
+
+export function validateBrief(input = {}) {
+  const brief = normalizeBrief(input);
+  const missing = [];
+  if (!brief.title) missing.push("a project title");
+  if (!brief.objective) missing.push("the project objective");
+  if (!brief.audience) missing.push("the target audience");
+  if (!brief.deliverables.length) missing.push("at least one deliverable");
+  return { ok: missing.length === 0, brief, reason: missing.length ? `Please add ${missing.join(", ")}.` : "" };
+}
+
+export function briefToMarkdown(input = {}) {
+  const b = normalizeBrief(input);
+  const list = (items) => items.length ? items.map(x => `- ${x}`).join("\n") : "- Not specified";
+  return [
+    `# ${b.title || "Untitled project"}`,
+    b.client ? `**Client:** ${b.client}` : "",
+    `**Project type:** ${b.projectType}`,
+    "",
+    "## Objective", b.objective || "Not specified",
+    "",
+    "## Target audience", b.audience || "Not specified",
+    "",
+    "## Scope", b.scope || "Not specified",
+    "",
+    "## Deliverables", list(b.deliverables),
+    "",
+    "## Constraints", list(b.constraints),
+    "",
+    "## Timeline", b.timeline || "Not specified",
+    "",
+    "## Budget", b.budget || "Not specified",
+    "",
+    "## Assumptions", list(b.assumptions),
+    "",
+    "## Open questions", list(b.openQuestions),
+    "",
+    "## Next steps", list(b.nextSteps),
+    "",
+    "---",
+    "Prepared with BriefBridge. Confirm assumptions and commercial terms with the client before work begins.",
+  ].filter((line, index, all) => !(line === "" && all[index - 1] === "")).join("\n");
+}
+
+function readSaved() {
+  try {
+    const value = JSON.parse(localStorage.getItem(STORE_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch { return []; }
+}
+
+function writeSaved(items) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(items));
+}
+
+function makeId() {
+  return globalThis.crypto?.randomUUID?.() || `brief-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function readDraft() {
+  try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}"); }
+  catch { return {}; }
+}
+
+function currentFormData() {
+  const form = document.querySelector("#brief-form");
+  if (!form) return readDraft();
+  return Object.fromEntries(new FormData(form).entries());
+}
+
+export class App {
+  static page = {
+    getWorkspaceState() {
+      const savedBriefs = readSaved().map(({ id, createdAt, brief }) => ({
+        id, createdAt, title: brief.title, projectType: brief.projectType,
+      }));
+      return {
+        product: "BriefBridge",
+        purpose: "Turn project requests into clear, reviewable project briefs.",
+        currentDraft: normalizeBrief(currentFormData()),
+        savedBriefs,
+        availableActions: ["create a structured brief", "save a brief after confirmation", "export a brief as Markdown or JSON"],
+        limitations: ["BriefBridge does not sign contracts, collect payments, guarantee project budgets, or book services."],
+      };
+    },
+    savedBriefIds() { return readSaved().map(item => item.id); },
+    getBrief(id) { return readSaved().find(item => item.id === id) || null; },
+    checkSaveBrief(input) { return validateBrief(input); },
+    saveBrief(input) {
+      const checked = validateBrief(input);
+      if (!checked.ok) return { ok: false, reason: checked.reason };
+      const items = readSaved();
+      const record = { id: makeId(), createdAt: new Date().toISOString(), brief: checked.brief };
+      items.unshift(record);
+      writeSaved(items.slice(0, 50));
+      window.dispatchEvent(new CustomEvent("briefbridge:saved", { detail: record }));
+      return { ok: true, id: record.id, title: record.brief.title, createdAt: record.createdAt };
+    },
+    checkDeleteBrief(id) {
+      const item = readSaved().find(entry => entry.id === id);
+      return item ? { ok: true, title: item.brief.title } : { ok: false, reason: "That saved brief no longer exists. Refresh the workspace and try again." };
+    },
+    deleteBrief(id) {
+      const check = this.checkDeleteBrief(id);
+      if (!check.ok) return { ok: false, reason: check.reason };
+      writeSaved(readSaved().filter(item => item.id !== id));
+      window.dispatchEvent(new CustomEvent("briefbridge:deleted", { detail: { id } }));
+      return { ok: true, deleted: id, title: check.title };
+    },
+  };
+}
+
+function setFormValues(brief) {
+  const form = document.querySelector("#brief-form");
+  if (!form) return;
+  for (const [key, value] of Object.entries(normalizeBrief(brief))) {
+    const field = form.elements.namedItem(key);
+    if (!field) continue;
+    field.value = Array.isArray(value) ? value.join("\n") : value;
+  }
+}
+
+function readFormBrief() {
+  const data = currentFormData();
+  return normalizeBrief(data);
+}
+
+function renderPreview(brief) {
+  const preview = document.querySelector("#brief-preview");
+  if (!preview) return;
+  const valid = validateBrief(brief);
+  preview.replaceChildren();
+  const title = document.createElement("h3");
+  title.textContent = valid.brief.title || "Your project brief";
+  const status = document.createElement("p");
+  status.className = valid.ok ? "preview-status ready" : "preview-status";
+  status.textContent = valid.ok ? "Ready to save" : valid.reason;
+  const body = document.createElement("pre");
+  body.textContent = briefToMarkdown(valid.brief);
+  preview.append(title, status, body);
+  document.querySelector("#export-markdown").disabled = !valid.ok;
+  document.querySelector("#export-json").disabled = !valid.ok;
+}
+
+function renderSaved() {
+  const list = document.querySelector("#saved-briefs");
+  if (!list) return;
+  list.replaceChildren();
+  const items = readSaved();
+  document.querySelector("#saved-count").textContent = String(items.length).padStart(2, "0");
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Your saved briefs will appear here.";
+    list.append(empty);
+    return;
+  }
+  for (const item of items) {
+    const card = document.createElement("article");
+    card.className = "saved-item";
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "saved-open";
+    open.dataset.openBrief = item.id;
+    const heading = document.createElement("strong");
+    heading.textContent = item.brief.title;
+    const meta = document.createElement("span");
+    meta.textContent = `${item.brief.projectType} · ${new Date(item.createdAt).toLocaleDateString()}`;
+    open.append(heading, meta);
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "icon-button";
+    remove.dataset.deleteBrief = item.id;
+    remove.setAttribute("aria-label", `Delete ${item.brief.title}`);
+    remove.textContent = "×";
+    card.append(open, remove);
+    list.append(card);
+  }
+}
+
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = name;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function init() {
+  const form = document.querySelector("#brief-form");
+  if (!form) return;
+  setFormValues(readDraft());
+  renderPreview(readFormBrief());
+  renderSaved();
+
+  form.addEventListener("input", () => {
+    const draft = readFormBrief();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    renderPreview(draft);
+  });
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const result = App.page.saveBrief(readFormBrief());
+    const notice = document.querySelector("#form-notice");
+    notice.textContent = result.ok ? "Brief saved to this browser." : result.reason;
+    notice.className = result.ok ? "notice success" : "notice";
+    renderSaved();
+  });
+
+  document.querySelector("#export-markdown").addEventListener("click", () => {
+    const b = readFormBrief();
+    if (validateBrief(b).ok) downloadFile(`${(b.title || "brief").toLowerCase().replace(/[^a-z0-9]+/g, "-")}.md`, briefToMarkdown(b), "text/markdown");
+  });
+  document.querySelector("#export-json").addEventListener("click", () => {
+    const b = readFormBrief();
+    if (validateBrief(b).ok) downloadFile("briefbridge-project-brief.json", JSON.stringify(b, null, 2), "application/json");
+  });
+  document.querySelector("#reset-form").addEventListener("click", () => {
+    form.reset();
+    localStorage.removeItem(DRAFT_KEY);
+    renderPreview(readFormBrief());
+    document.querySelector("#form-notice").textContent = "Draft cleared.";
+  });
+  document.querySelector("#saved-briefs").addEventListener("click", event => {
+    const open = event.target.closest("[data-open-brief]");
+    const remove = event.target.closest("[data-delete-brief]");
+    if (open) {
+      const item = App.page.getBrief(open.dataset.openBrief);
+      if (item) { setFormValues(item.brief); renderPreview(item.brief); }
+    }
+    if (remove) {
+      const item = App.page.getBrief(remove.dataset.deleteBrief);
+      if (item && window.confirm(`Delete “${item.brief.title}” from this browser?`)) {
+        App.page.deleteBrief(item.id);
+        renderSaved();
+      }
+    }
+  });
+  window.addEventListener("briefbridge:saved", renderSaved);
+  window.addEventListener("briefbridge:deleted", renderSaved);
+  document.querySelector("#fill-example").addEventListener("click", () => {
+    setFormValues({
+      title: "Brand launch campaign",
+      client: "Northstar Studio",
+      projectType: "Marketing",
+      objective: "Launch a new creative studio brand and generate qualified enquiries during the first month.",
+      audience: "Early-stage founders and small business owners who need brand identity and digital content.",
+      scope: "Create a focused launch campaign across the studio website and social channels.",
+      deliverables: ["Campaign concept and messaging", "Landing page copy", "10 social media posts", "Launch content calendar"],
+      constraints: ["Keep the visual direction minimal and accessible", "Use existing brand assets where possible"],
+      timeline: "4 weeks from kickoff",
+      budget: "To be agreed with client",
+      assumptions: ["Client supplies brand assets and approves copy within two working days"],
+      openQuestions: ["Which channels are highest priority?", "Is paid media included?"],
+      nextSteps: ["Confirm deliverables", "Agree budget and milestones", "Schedule kickoff"],
+    });
+    renderPreview(readFormBrief());
+  });
+}
+
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+}
