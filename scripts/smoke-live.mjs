@@ -82,6 +82,8 @@ const network = await check("/briefbridge_network.network.json", { json: true, c
 const alias = await check("/briefbridge_network", { json: true });
 await check("/runtime/index.js", { includes: "export" });
 await check("/app.js", { includes: "normalizeBrief" });
+await check("/app.js", { includes: "parseBriefJson" });
+await check("/index.html", { includes: 'id="import-json"' });
 await check("/site.js", { includes: "Open questions", retries: 5 });
 await check("/runtime/sandbox-worker.js", { includes: "self" });
 await check("/bridge/action-bridge.html", { includes: "action-bridge.js" });
