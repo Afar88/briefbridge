@@ -16,7 +16,7 @@ BriefBridge is designed for freelancers, creative teams, small businesses and cl
 2. **Clarify what is missing.** The coordinator asks focused follow-up questions rather than silently filling gaps.
 3. **Organize the scope.** A specialist agent structures the objective, audience, deliverables, constraints, timeline, budget, assumptions and open questions.
 4. **Review before saving.** The visitor checks the proposed brief. Agent-driven save and delete actions require an explicit browser confirmation.
-5. **Keep and reuse the result.** Briefs are saved locally in the visitor's browser and can be exported as Markdown or JSON.
+5. **Keep and reuse the result.** Briefs are saved locally in the visitor's browser, can be exported as Markdown or JSON, and previously exported JSON briefs can be imported for review and reuse.
 
 The agents are instructed not to invent prices, dates, deliverables, approvals or client facts. BriefBridge prepares a working brief; it does not sign contracts, collect payments or guarantee project outcomes.
 
