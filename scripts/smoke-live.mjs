@@ -20,12 +20,15 @@ async function request(path) {
   throw new Error(`${path}: request failed after retry: ${lastError?.message || lastError}`);
 }
 
-async function check(path, { json = false, cors = false, includes = "", retries = 0 } = {}) {
+async function check(path, { json = false, cors = false, includes = "", cache = false, retries = 0 } = {}) {
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
       const { response, body, elapsedMs } = await request(path);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (cache && !(response.headers.get("cache-control") || "").includes("no-cache")) {
+        throw new Error("missing Cache-Control: no-cache; updated static assets may remain stale");
+      }
       if (cors && response.headers.get("access-control-allow-origin") !== "*") {
         throw new Error("missing Access-Control-Allow-Origin: *");
       }
@@ -82,8 +85,8 @@ const network = await check("/briefbridge_network.network.json", { json: true, c
 const alias = await check("/briefbridge_network", { json: true });
 await check("/runtime/index.js", { includes: "export" });
 await check("/app.js", { includes: "normalizeBrief" });
-await check("/app.js", { includes: "parseBriefJson" });
-await check("/index.html", { includes: 'id="import-json"' });
+await check("/app.js", { includes: "parseBriefJson", cache: true });
+await check("/index.html", { includes: 'id="import-json"', cache: true });
 await check("/site.js", { includes: "Open questions", retries: 5 });
 await check("/runtime/sandbox-worker.js", { includes: "self" });
 await check("/bridge/action-bridge.html", { includes: "action-bridge.js" });
