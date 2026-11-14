@@ -1,0 +1,25 @@
+name: BriefBridge live endpoint monitor
+
+on:
+  push:
+    branches: ["build/complete-mozilla-otari"]
+  workflow_dispatch:
+  schedule:
+    # 08:00 UTC = 09:00 in Lagos (Africa/Lagos, UTC+1).
+    - cron: "0 8 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  public-endpoints:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check live website and discovery resources
+        run: node scripts/smoke-live.mjs
+        env:
+          SITE_URL: https://briefbridge-bpxd.onrender.com
