@@ -47,6 +47,8 @@ const manifest = await check("/agent-manifest.json", { json: true, cors: true })
 const network = await check("/briefbridge_network.network.json", { json: true, cors: true });
 const alias = await check("/briefbridge_network", { json: true });
 await check("/runtime/index.js", { includes: "export" });
+await check("/app.js", { includes: "normalizeBrief" });
+await check("/site.js", { includes: "Open questions" });
 await check("/runtime/sandbox-worker.js", { includes: "self" });
 await check("/bridge/action-bridge.html", { includes: "action-bridge.js" });
 await check("/links.json", { json: true, cors: true });
