@@ -1,3 +1,19 @@
+## Deploy on Netlify
+
+BriefBridge is a static site. Netlify is the primary hosting target because the repository already includes `netlify.toml` and `_headers`, which preserve the security and cross-origin headers required by Open Agentic Web discovery.
+
+1. Import `Afar88/briefbridge` into [Netlify](https://app.netlify.com/).
+2. Set the production branch to `main`; for the current review build, use the `build/complete-mozilla-otari` branch as a Deploy Preview or branch deploy.
+3. Keep the base directory empty (repository root). The checked-in `netlify.toml` configures the build command as `npm run check`, publish directory as `.`, and Node.js as `22`.
+4. Allow the first deploy to finish, then verify that the site is publicly accessible.
+5. Verify that `/agent-manifest.json` and `/briefbridge_network.network.json` return successfully with `Access-Control-Allow-Origin: *`.
+6. Verify that `/runtime/sandbox-worker.js` is served with the restrictive Content Security Policy required by the coded-tool sandbox.
+7. Test the assistant with your own Otari key and check the network URL from a second browser or agentic site.
+
+The `_headers` file applies global security headers, public CORS to discovery/network artifacts, and the required worker CSP. The `netlify.toml` also maps the public network URL `/briefbridge_network` to `/briefbridge_network.network.json`.
+
+Vercel configuration is retained as a secondary hosting option in `vercel.json`. Netlify is the selected primary platform for this release.
+
 # BriefBridge
 
 **Clarity before the work begins.** BriefBridge turns scattered project requests into clear, reviewable project briefs that clients, creatives and small teams can work from.
