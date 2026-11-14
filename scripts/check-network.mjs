@@ -39,6 +39,11 @@ for (const name of manifest.actions?.agentTools || []) {
 }
 const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");
 if (!/publish\s*=\s*"\."/m.test(netlifyConfig) || !/command\s*=\s*"npm run check"/m.test(netlifyConfig)) {
+if (!/from\s*=\s*"\/briefbridge_network"/m.test(netlifyConfig) ||
+    !/to\s*=\s*"\/briefbridge_network\.network\.json"/m.test(netlifyConfig) ||
+    !/status\s*=\s*200/m.test(netlifyConfig)) {
+  fail("Netlify must rewrite /briefbridge_network to the published network JSON.");
+}
   fail("Netlify must publish the repository root after running npm run check.");
 }
 const headerText = await readFile(resolve(root, "_headers"), "utf8");
