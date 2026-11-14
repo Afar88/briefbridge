@@ -2,7 +2,6 @@ services:
   - type: web
     name: briefbridge
     runtime: static
-    plan: free
     branch: build/complete-mozilla-otari
     autoDeploy: true
     buildCommand: npm install && npm run check
