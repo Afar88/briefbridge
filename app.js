@@ -3,7 +3,7 @@ const DRAFT_KEY = "briefbridge.draft.v1";
 
 const text = (value, max = 1200) => String(value ?? "").trim().slice(0, max);
 const lines = (value, maxItems = 12) => {
-  const values = Array.isArray(value) ? value : String(value ?? "").split(/\n|,/);
+  const values = Array.isArray(value) ? value : String(value ?? "").split(/\r?\n/);
   return values.map(item => text(item, 220)).filter(Boolean).slice(0, maxItems);
 };
 
@@ -230,8 +230,12 @@ function downloadFile(name, content, type) {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = name;
+  anchor.hidden = true;
+  document.body.append(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.remove();
+  // Let the browser begin the download before releasing its object URL.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function init() {
@@ -265,9 +269,12 @@ function init() {
   });
   document.querySelector("#reset-form").addEventListener("click", () => {
     form.reset();
-    localStorage.removeItem(DRAFT_KEY);
+    let cleared = true;
+    try { localStorage.removeItem(DRAFT_KEY); } catch { cleared = false; }
     renderPreview(readFormBrief());
-    document.querySelector("#form-notice").textContent = "Draft cleared.";
+    const notice = document.querySelector("#form-notice");
+    notice.textContent = cleared ? "Draft cleared." : "The form was cleared, but browser storage could not be updated.";
+    notice.className = cleared ? "notice success" : "notice";
   });
   document.querySelector("#saved-briefs").addEventListener("click", event => {
     const open = event.target.closest("[data-open-brief]");
@@ -283,8 +290,11 @@ function init() {
     if (remove) {
       const item = App.page.getBrief(remove.dataset.deleteBrief);
       if (item && window.confirm(`Delete “${item.brief.title}” from this browser?`)) {
-        App.page.deleteBrief(item.id);
+        const result = App.page.deleteBrief(item.id);
         renderSaved();
+        const notice = document.querySelector("#form-notice");
+        notice.textContent = result.ok ? `Deleted “${result.title}”.` : result.reason;
+        notice.className = result.ok ? "notice success" : "notice";
       }
     }
   });
