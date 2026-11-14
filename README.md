@@ -77,7 +77,7 @@ BriefBridge is a static site and does not require a server-side framework or env
 8. Verify that `/runtime/sandbox-worker.js` is served with the restrictive Content Security Policy required by the coded-tool sandbox.
 9. Test the assistant with your own Otari key and check the network URL from a second browser or agentic site.
 
-The Vercel-native `vercel.json` applies the public CORS headers only to discovery/network artifacts and applies the required restrictive CSP to `runtime/sandbox-worker.js`. It deliberately does not set `X-Frame-Options` or a frame-blocking CSP on `/bridge/`; other agent sites need to load the bridge.
+The Vercel-native `vercel.json` maps the public network URL `/briefbridge_network` to `/briefbridge_network.network.json`, applies public CORS headers only to discovery/network artifacts, and applies the required restrictive CSP to `runtime/sandbox-worker.js`. It deliberately does not set `X-Frame-Options` or a frame-blocking CSP on `/bridge/`; other agent sites need to load the bridge.
 
 The `netlify.toml` and `_headers` files are retained only as an optional Netlify fallback; Vercel uses `vercel.json`.
 
