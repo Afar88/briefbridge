@@ -13,6 +13,9 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+      - path: /*
+        name: Cache-Control
+        value: no-cache
       - path: /agent-manifest.json
         name: Access-Control-Allow-Origin
         value: "*"
