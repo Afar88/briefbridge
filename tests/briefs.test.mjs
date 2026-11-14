@@ -45,3 +45,16 @@ test("exports a readable Markdown brief without inventing missing values", () =>
   assert.match(markdown, /- Landing page copy/);
   assert.match(markdown, /Budget\nNot specified/);
 });
+
+test("normalizes comma-separated lists and trims empty entries", () => {
+  const result = normalizeBrief({
+    deliverables: "Landing page, Social content,, Email sequence",
+    constraints: "No paid ads\n  ",
+  });
+  assert.deepEqual(result.deliverables, ["Landing page", "Social content", "Email sequence"]);
+  assert.deepEqual(result.constraints, ["No paid ads"]);
+});
+
+test("uses a safe project type when none is supplied", () => {
+  assert.equal(normalizeBrief({ title: "Test" }).projectType, "Other");
+});
