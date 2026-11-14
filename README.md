@@ -63,17 +63,23 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 
 BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. If your browser reports a CORS error, the gateway must allow the BriefBridge origin for inference requests. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/v1` endpoint.
 
-## Deploy
+## Deploy on Vercel
 
-The repository is static-host friendly. Netlify is configured with `netlify.toml` and `_headers`.
+BriefBridge is a static site and does not require a server-side framework or environment variables. Vercel is configured through `vercel.json`.
 
-1. Import this repository into Netlify.
-2. Use the repository root as the publish directory. The build command runs `npm run check`.
-3. Deploy over HTTPS.
-4. After deployment, verify that `/agent-manifest.json` and `/briefbridge_network.network.json` are publicly readable.
-5. Test the assistant with your own Otari key and check the network URL from a second browser or agentic site.
+1. Import `Afar88/briefbridge` into Vercel.
+2. Set the Root Directory to the repository root.
+3. Set Framework Preset to **Other** (no framework).
+4. Set the Build Command to `npm run check`, Install Command to `npm install`, and Output Directory to `.`.
+5. Use Node.js 22.x or newer (the project is tested with Node.js 22).
+6. Deploy to a Preview first. Keep the preview accessible to external reviewers; team SSO protection must not block judges or testers.
+7. Verify that `/agent-manifest.json` and `/briefbridge_network.network.json` return successfully and include `Access-Control-Allow-Origin: *`.
+8. Verify that `/runtime/sandbox-worker.js` is served with the restrictive Content Security Policy required by the coded-tool sandbox.
+9. Test the assistant with your own Otari key and check the network URL from a second browser or agentic site.
 
-The `_headers` file grants public CORS access only to published agent artifacts and applies the required restrictive CSP to `runtime/sandbox-worker.js`. Do not add a frame-blocking header to `/bridge/`; other agent sites need to load the bridge.
+The Vercel-native `vercel.json` applies the public CORS headers only to discovery/network artifacts and applies the required restrictive CSP to `runtime/sandbox-worker.js`. It deliberately does not set `X-Frame-Options` or a frame-blocking CSP on `/bridge/`; other agent sites need to load the bridge.
+
+The `netlify.toml` and `_headers` files are retained only as an optional Netlify fallback; Vercel uses `vercel.json`.
 
 ## Architecture
 
