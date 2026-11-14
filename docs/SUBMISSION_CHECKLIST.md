@@ -30,3 +30,8 @@
 If submitting with Otari, the Devpost page asks for the email on the Otari account so the organizers can match usage. Add it directly to Devpost; do not commit it to this repository.
 
 The submission also asks for a short note describing an issue encountered with Otari and how it could improve. Record an honest observation from testing before writing this answer. Do not invent a problem or claim that a bug occurred if it did not.
+
+
+## Live endpoint smoke test
+
+Run `SITE_URL=https://briefbridge-bpxd.onrender.com npm run smoke` from a Node 20+ environment to check the homepage, published manifest/network JSON, alias route, bridge/runtime assets, CORS response headers and worker CSP. The command sends a cross-origin `Origin` header and verifies the server's CORS response; it does not replace a real browser integration test or an Otari request with a visitor-owned key.
