@@ -46,12 +46,12 @@ test("exports a readable Markdown brief without inventing missing values", () =>
   assert.match(markdown, /Budget\nNot specified/);
 });
 
-test("normalizes comma-separated lists and trims empty entries", () => {
+test("normalizes newline-separated lists and preserves commas within entries", () => {
   const result = normalizeBrief({
-    deliverables: "Landing page, Social content,, Email sequence",
+    deliverables: "Landing page, including responsive layouts\nSocial content, with captions\nEmail sequence",
     constraints: "No paid ads\n  ",
   });
-  assert.deepEqual(result.deliverables, ["Landing page", "Social content", "Email sequence"]);
+  assert.deepEqual(result.deliverables, ["Landing page, including responsive layouts", "Social content, with captions", "Email sequence"]);
   assert.deepEqual(result.constraints, ["No paid ads"]);
 });
 
