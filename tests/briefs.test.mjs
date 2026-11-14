@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeBrief, validateBrief, briefToMarkdown, parseBriefJson } from "../app.js";
+import { App, normalizeBrief, validateBrief, briefToMarkdown, parseBriefJson } from "../app.js";
 
 test("normalizes a complete project brief", () => {
   const result = validateBrief({
@@ -74,6 +74,40 @@ test("rejects malformed or incomplete JSON imports", () => {
   const incomplete = parseBriefJson({ title: "Missing details" });
   assert.equal(incomplete.ok, false);
   assert.match(incomplete.reason, /objective/);
+});
+
+test("refuses to silently discard saved briefs when the library is full", () => {
+  const previousStorage = globalThis.localStorage;
+  const previousWindow = globalThis.window;
+  const store = new Map();
+  const existing = Array.from({ length: 50 }, (_, index) => ({
+    id: `saved-${index}`,
+    createdAt: new Date(0).toISOString(),
+    brief: { title: `Saved ${index}`, objective: "Objective", audience: "Audience", deliverables: ["Deliverable"] },
+  }));
+  store.set("briefbridge.saved.v1", JSON.stringify(existing));
+  globalThis.localStorage = {
+    getItem: key => store.get(key) ?? null,
+    setItem: (key, value) => store.set(key, value),
+  };
+  globalThis.window = { dispatchEvent() {} };
+  try {
+    const result = App.page.saveBrief({
+      title: "Another project",
+      objective: "A clear objective",
+      audience: "A defined audience",
+      deliverables: ["A deliverable"],
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.reason, /library is full/);
+    assert.equal(JSON.parse(store.get("briefbridge.saved.v1")).length, 50);
+    assert.equal(JSON.parse(store.get("briefbridge.saved.v1"))[0].id, "saved-0");
+  } finally {
+    if (previousStorage === undefined) delete globalThis.localStorage;
+    else globalThis.localStorage = previousStorage;
+    if (previousWindow === undefined) delete globalThis.window;
+    else globalThis.window = previousWindow;
+  }
 });
 
 test("uses a safe project type when none is supplied", () => {
