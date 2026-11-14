@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: briefbridge
+    runtime: static
+    branch: build/complete-mozilla-otari
+    autoDeploy: true
+    buildCommand: npm install && npm run check
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /agent-manifest.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /briefbridge_network.network.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /links.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /agent-mcp.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /.well-known/nsdeploy.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /.well-known/nsdeploy-agent.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /runtime/sandbox-worker.js
+        name: Content-Security-Policy
+        value: "default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'"
+    routes:
+      - type: rewrite
+        source: /briefbridge_network
+        destination: /briefbridge_network.network.json

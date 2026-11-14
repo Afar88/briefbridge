@@ -1,0 +1,7 @@
+{
+  "protocol": "nsdeploy-agent-mcp/v1",
+  "network": "briefbridge_network",
+  "front_man": "briefbridge_coordinator",
+  "available": false,
+  "reason": "This static website publishes a browser-callable agent network and does not run a separate MCP server."
+}

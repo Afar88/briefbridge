@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+  command = "npm run check"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/briefbridge_network"
+  to = "/briefbridge_network.network.json"
+  status = 200
+  force = true
