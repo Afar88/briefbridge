@@ -284,6 +284,32 @@ function init() {
     const b = readFormBrief();
     if (validateBrief(b).ok) downloadFile("briefbridge-project-brief.json", JSON.stringify(b, null, 2), "application/json");
   });
+  const importInput = document.querySelector("#import-json-file");
+  document.querySelector("#import-json").addEventListener("click", () => importInput.click());
+  importInput.addEventListener("change", async () => {
+    const file = importInput.files?.[0];
+    if (!file) return;
+    const notice = document.querySelector("#form-notice");
+    try {
+      if (file.size > 1_000_000) {
+        throw new Error("That file is too large. Choose a JSON brief under 1 MB.");
+      }
+      const result = parseBriefJson(await file.text());
+      if (!result.ok) throw new Error(result.reason);
+      setFormValues(result.brief);
+      const persisted = persistDraft(result.brief);
+      renderPreview(result.brief);
+      notice.textContent = persisted
+        ? "Brief imported into the editor. Review it, then save when ready."
+        : "Brief imported into the editor, but this browser could not autosave the draft.";
+      notice.className = persisted ? "notice success" : "notice";
+    } catch (error) {
+      notice.textContent = error.message || "The selected file could not be imported.";
+      notice.className = "notice";
+    } finally {
+      importInput.value = "";
+    }
+  });
   document.querySelector("#reset-form").addEventListener("click", () => {
     form.reset();
     let cleared = true;
