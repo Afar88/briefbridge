@@ -36,7 +36,7 @@ export const API_KEY_PROVIDERS = [
     name: "Otari",
     keyUrl: "https://otari.ai/dashboard#/keys",
     router: "https://api.otari.ai/api/v1",
-    model: "alibaba/qwen3.8-flash",
+    model: "mzai:moonshotai/Kimi-K2.6",
     keyPrefixes: ["otk_"],
     accessNote: "Billing may be required",
   },
