@@ -149,3 +149,41 @@ body>dialog button{margin-right:8px}
 .footer p{margin:0}
 @media(max-width:950px){.hero{gap:30px}.value-strip{margin:0 36px}.workspace-grid{grid-template-columns:1fr}.side-column{grid-template-columns:1fr 1fr}.privacy-note{grid-column:1/-1}.assistant-section{grid-template-columns:1fr;padding-top:70px}.assistant-intro{position:static}.assistant-panels{grid-template-columns:1fr 180px}}
 @media(max-width:680px){.topbar{padding:0 20px;height:66px}.topbar nav{display:none}.topbar-cta{font-size:11px}.hero{padding:64px 22px 55px;grid-template-columns:1fr;gap:45px}.hero h1{font-size:54px;letter-spacing:-3px}.hero-lede{font-size:15px}.hero-visual{min-height:380px;padding-left:10px}.visual-content{padding:27px 24px}.visual-content h2{font-size:35px}.orbit-one{right:-170px}.orbit-two{right:-200px}.value-strip{margin:0 22px;grid-template-columns:1fr;gap:18px;padding:24px 0}.value-strip>div{padding-left:32px}.workspace-section{padding:70px 18px}.section-heading{align-items:start;flex-direction:column}.section-heading h2{font-size:34px}.builder-panel{padding:19px}.panel-heading{align-items:start;gap:10px;flex-direction:column}.form-row,.form-row:first-child,.form-row:nth-child(2){grid-template-columns:1fr}.form-actions{align-items:stretch}.form-actions .button{flex:1 1 45%}.side-column{grid-template-columns:1fr}.privacy-note{grid-column:auto}.assistant-section{padding:68px 18px;gap:30px}.assistant-intro h2{font-size:36px}.assistant-panels{grid-template-columns:1fr}.assistant-shell{min-width:0}#agent-app.ns-composed-app [data-ns-slot="chat"]{height:620px}.closing-cta{padding:60px 22px;align-items:start;flex-direction:column}.closing-cta h2{font-size:36px}.footer{padding:22px;gap:12px;flex-wrap:wrap}.footer p{order:3;flex-basis:100%}}
+
+
+/* Workspace-first entry paths and clearer navigation. */
+.workspace-start{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:-12px 0 24px}
+.start-card{display:flex;align-items:center;gap:15px;min-width:0;padding:19px 20px;background:#172337;border:1px solid var(--line);border-radius:15px;transition:border-color .18s,transform .18s,background .18s}
+.start-card:hover{border-color:#c5f36b77;transform:translateY(-2px);background:#1b2a40}
+.start-card:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.start-card-primary{background:linear-gradient(120deg,#203149,#1a2a40);border-color:#c5f36b55}
+.start-card-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:12px;background:#c5f36b18;color:var(--lime);font-size:20px}
+.start-card-copy{display:grid;gap:4px;min-width:0}
+.start-card-copy strong{font:650 14px Manrope,sans-serif;color:#f2f5f9}
+.start-card-copy small{font-size:11px;line-height:1.5;color:#9eacbf}
+.start-card-arrow{margin-left:auto;color:var(--lime);font-size:18px}
+#saved-library{scroll-margin-top:24px}
+#brief-form{scroll-margin-top:24px}
+.topbar nav a:focus-visible,.topbar-cta:focus-visible,.brand:focus-visible{outline:2px solid var(--lime);outline-offset:5px;border-radius:4px}
+@media(max-width:680px){
+  .topbar{height:auto;min-height:66px;padding:12px 18px;display:grid;grid-template-columns:1fr auto;row-gap:9px}
+  .topbar nav{display:flex;grid-column:1/-1;grid-row:2;gap:20px;max-width:100%;overflow-x:auto;padding:3px 1px 7px;white-space:nowrap;scrollbar-width:thin;font-size:12px}
+  .topbar-cta{grid-column:2;grid-row:1}
+  .workspace-start{grid-template-columns:1fr;margin:0 0 18px;gap:10px}
+  .start-card{padding:15px}
+  .start-card-copy strong{font-size:13px}
+  .start-card-copy small{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .start-card,.button{transition:none}
+  .start-card:hover,.button:hover{transform:none}
+}
+
+.optional-fields{border:1px solid var(--line);border-radius:12px;background:#121e2e;overflow:hidden}
+.optional-fields>summary{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:13px 15px;cursor:pointer;color:#e1e9f3;font-size:12px;font-weight:700;list-style-position:inside}
+.optional-fields>summary::marker{color:var(--lime)}
+.optional-fields>summary span{font-size:10px;font-weight:400;color:#8798ad}
+.optional-fields[open]>summary{border-bottom:1px solid var(--line);background:#19283b}
+.optional-fields-content{display:grid;gap:16px;padding:16px}
+.optional-fields-content .form-row{margin:0}
+@media(max-width:680px){.optional-fields-content{padding:13px}.optional-fields>summary{align-items:flex-start}}

@@ -18,7 +18,7 @@
     <nav aria-label="Main navigation">
       <a href="#workspace">Workspace</a>
       <a href="#assistant">AI assistant</a>
-      <a href="#how-it-works">How it works</a>
+      <a href="#saved-library">Saved briefs</a>
     </nav>
     <a class="topbar-cta" href="#workspace">Create a brief <span aria-hidden="true">↗</span></a>
   </header>
@@ -62,10 +62,22 @@
 
     <section class="workspace-section" id="workspace">
       <div class="section-heading">
-        <div><div class="eyebrow">YOUR WORKSPACE</div><h2>Build a better starting point.</h2><p>Capture what you know now. You can refine the details as the project becomes clearer.</p></div>
+        <div><div class="eyebrow">YOUR WORKSPACE</div><h2>What would you like to do?</h2><p>Start with a rough idea or build a structured brief yourself. You can switch paths whenever you need.</p></div>
         <button class="text-button" id="fill-example" type="button">Load a sample brief <span>↗</span></button>
       </div>
 
+      <div class="workspace-start" aria-label="Choose how to create a brief">
+        <a class="start-card start-card-primary" href="#brief-form">
+          <span class="start-card-icon" aria-hidden="true">✳</span>
+          <span class="start-card-copy"><strong>Build a brief manually</strong><small>Fill in the details at your own pace. No AI key required.</small></span>
+          <span class="start-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="start-card" href="#assistant">
+          <span class="start-card-icon" aria-hidden="true">✦</span>
+          <span class="start-card-copy"><strong>Start with AI</strong><small>Describe your idea and let BriefBridge help shape the brief.</small></span>
+          <span class="start-card-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
       <div class="workspace-grid">
         <section class="builder-panel">
           <div class="panel-heading"><div><span class="panel-index">01 / INTAKE</span><h3>Project details</h3></div><span class="panel-state">Autosaves in this browser</span></div>
@@ -76,21 +88,26 @@
             </div>
             <div class="form-row">
               <label class="field"><span>Project type</span><select name="projectType"><option>Marketing</option><option>Branding</option><option>Web design</option><option>Software / product</option><option>Content creation</option><option>Event</option><option>Research</option><option>Other</option></select></label>
-              <label class="field"><span>Timeline</span><input name="timeline" maxlength="240" placeholder="e.g. 3 weeks from kickoff"></label>
-              <label class="field"><span>Budget</span><input name="budget" maxlength="160" placeholder="e.g. To be agreed"></label>
             </div>
             <label class="field"><span>What is the main objective? <b>*</b></span><textarea name="objective" rows="3" maxlength="1600" placeholder="What should this project achieve?" required></textarea></label>
             <label class="field"><span>Who is the target audience? <b>*</b></span><textarea name="audience" rows="2" maxlength="800" placeholder="Describe the people this work is for." required></textarea></label>
-            <label class="field"><span>What is included in the scope?</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Add background, boundaries or important context."></textarea></label>
-            <div class="form-row">
-              <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One deliverable per line" required></textarea><small>Be specific about what will be handed over.</small></label>
-              <label class="field"><span>Constraints / requirements</span><textarea name="constraints" rows="4" placeholder="One requirement per line"></textarea><small>Include dependencies, preferences or things to avoid.</small></label>
-            </div>
-            <div class="form-row">
-              <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One assumption per line"></textarea></label>
-              <label class="field"><span>Open questions</span><textarea name="openQuestions" rows="3" placeholder="What still needs an answer?"></textarea></label>
-            </div>
-            <label class="field"><span>Suggested next steps</span><textarea name="nextSteps" rows="2" placeholder="One next step per line"></textarea></label>
+            <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One deliverable per line" required></textarea><small>Be specific about what will be handed over.</small></label>
+            <details class="optional-fields">
+              <summary>Additional details <span>Optional · scope, timeline, budget and requirements</span></summary>
+              <div class="optional-fields-content">
+                <label class="field"><span>What is included in the scope?</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Add background, boundaries or important context."></textarea></label>
+                <div class="form-row">
+                  <label class="field"><span>Timeline</span><input name="timeline" maxlength="240" placeholder="e.g. 3 weeks from kickoff"></label>
+                  <label class="field"><span>Budget</span><input name="budget" maxlength="160" placeholder="e.g. To be agreed"></label>
+                </div>
+                <label class="field"><span>Constraints / requirements</span><textarea name="constraints" rows="3" placeholder="One requirement per line"></textarea><small>Include dependencies, preferences or things to avoid.</small></label>
+                <div class="form-row">
+                  <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One assumption per line"></textarea></label>
+                  <label class="field"><span>Open questions</span><textarea name="openQuestions" rows="3" placeholder="What still needs an answer?"></textarea></label>
+                </div>
+                <label class="field"><span>Suggested next steps</span><textarea name="nextSteps" rows="2" placeholder="One next step per line"></textarea></label>
+              </div>
+            </details>
             <div class="form-actions">
               <button class="button button-primary" type="submit">Save project brief <span>→</span></button>
               <button class="button button-outline" id="export-markdown" type="button" disabled>Export Markdown</button>
@@ -112,8 +129,8 @@
 
 Your structured brief will appear here as you fill in the form.</pre>
           </section>
-          <section class="saved-panel">
-            <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3>Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
+          <section class="saved-panel" id="saved-library" aria-labelledby="saved-library-heading">
+            <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3 id="saved-library-heading">Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
             <div id="saved-briefs" class="saved-list"><p class="empty-state">Your saved briefs will appear here.</p></div>
             <p class="saved-footnote">Saved locally in this browser. Export a copy to share or back it up.</p>
           </section>
