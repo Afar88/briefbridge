@@ -25,6 +25,23 @@ export function normalizeBrief(input = {}) {
   };
 }
 
+export function parseBriefJson(input) {
+  let value;
+  try {
+    value = typeof input === "string" ? JSON.parse(input) : input;
+  } catch {
+    return { ok: false, reason: "The selected file is not valid JSON." };
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { ok: false, reason: "The selected file must contain one project brief object." };
+  }
+  const checked = validateBrief(value);
+  if (!checked.ok) {
+    return { ok: false, reason: `This is not a complete project brief. ${checked.reason}` };
+  }
+  return { ok: true, brief: checked.brief };
+}
+
 export function validateBrief(input = {}) {
   const brief = normalizeBrief(input);
   const missing = [];
