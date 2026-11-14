@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseHocon } from "../runtime/hocon.js";
+import { AgentNetwork, validateNetwork } from "../runtime/kernel.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = async path => JSON.parse(await readFile(resolve(root, path), "utf8"));
@@ -11,14 +13,18 @@ if (!entry) fail("agent-manifest.json must publish briefbridge_network.");
 if (entry?.front_man !== "briefbridge_coordinator") fail("The network front_man does not match the coordinator.");
 if (entry?.hocon !== "./briefbridge_network.network.json") fail("The manifest must point to the public network JSON.");
 
-const network = await readJson("briefbridge_network.network.json");
+const networkJson = await readJson("briefbridge_network.network.json");
 const hoconText = await readFile(resolve(root, "briefbridge_network.hocon"), "utf8");
-if (JSON.stringify(JSON.parse(hoconText), null, 2) + "\n" !== JSON.stringify(network, null, 2) + "\n") {
+const hoconConfig = parseHocon(hoconText);
+if (JSON.stringify(hoconConfig, null, 2) + "\n" !== JSON.stringify(networkJson, null, 2) + "\n") {
   fail("The HOCON source and published JSON are out of sync.");
 }
-const agents = new Map((network.tools || []).map(agent => [agent.name, agent]));
-if (!agents.has(entry?.front_man)) fail("The front agent is missing from the network.");
-for (const agent of network.tools || []) {
+const network = new AgentNetwork(hoconConfig, entry?.name || "briefbridge_network");
+const validation = validateNetwork(network);
+for (const message of validation.errors) fail(`Open Agentic Web runtime validation: ${message}`);
+if (network.findFrontMan() !== entry?.front_man) fail("The runtime resolves a different front agent than the manifest.");
+const agents = new Map((network.config.tools || []).map(agent => [agent.name, agent]));
+for (const agent of network.config.tools || []) {
   for (const tool of agent.tools || []) {
     if (typeof tool === "string" && !agents.has(tool) && !tool.startsWith("https://")) {
       fail(`Agent ${agent.name} references missing agent ${tool}.`);
