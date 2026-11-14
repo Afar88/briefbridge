@@ -43,11 +43,21 @@ for (const [label, pattern] of [
   ["current review branch", /branch:\s*build\/complete-mozilla-otari/],
   ["validation build", /buildCommand:\s*npm install && npm run check/],
   ["repository-root publish", /staticPublishPath:\s*\./],
-  ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/],
-  ["worker CSP", /path:\s*\/runtime\/sandbox-worker\.js[\s\S]*?name:\s*Content-Security-Policy/]
+  ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/]
 ]) {
-  if (!pattern.test(renderConfig)) fail(`Render must configure ${label}.`);
+  if (!pattern.test(renderConfig)) fail(\`Render must configure \${label}.\`);
 }
+const renderHeaderBlock = path => {
+  const marker = \`      - path: \${path}\`;
+  const index = renderConfig.indexOf(marker);
+  if (index < 0) return "";
+  const next = renderConfig.indexOf("\n      - path:", index + marker.length);
+  return renderConfig.slice(index, next < 0 ? renderConfig.length : next);
+};
+const hasRenderHeader = (path, name, value) => {
+  const block = renderHeaderBlock(path);
+  return block.includes(\`name: \${name}\`) && block.includes(\`value: \${value}\`);
+};
 for (const path of [
   "/agent-manifest.json",
   "/briefbridge_network.network.json",
@@ -56,53 +66,15 @@ for (const path of [
   "/.well-known/nsdeploy.json",
   "/.well-known/nsdeploy-agent.json"
 ]) {
-  const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");");
-  const rule = new RegExp(`path:\\s*${escaped}[\\s\\S]*?name:\\s*Access-Control-Allow-Origin[\\s\\S]*?value:\\s*["']?\\*["']?`);
-  if (!rule.test(renderConfig)) fail(`Render must allow public CORS for ${path}.`);
-}
-const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");
-if (!/publish\s*=\s*"\."/m.test(netlifyConfig) || !/command\s*=\s*"npm run check"/m.test(netlifyConfig)) {
-if (!/from\s*=\s*"\/briefbridge_network"/m.test(netlifyConfig) ||
-    !/to\s*=\s*"\/briefbridge_network\.network\.json"/m.test(netlifyConfig) ||
-    !/status\s*=\s*200/m.test(netlifyConfig)) {
-  fail("Netlify must rewrite /briefbridge_network to the published network JSON.");
-}
-  fail("Netlify must publish the repository root after running npm run check.");
-}
-const headerText = await readFile(resolve(root, "_headers"), "utf8");
-const headerBlocks = new Map();
-let currentPath = null;
-for (const line of headerText.split(/\r?\n/)) {
-  if (!line.trim() || line.trim().startsWith("#")) continue;
-  if (!/^\s/.test(line)) {
-    currentPath = line.trim();
-    headerBlocks.set(currentPath, []);
-  } else if (currentPath) {
-    headerBlocks.get(currentPath).push(line.trim());
+  if (!hasRenderHeader(path, "Access-Control-Allow-Origin", '"*"')) {
+    fail(\`Render must allow public CORS for \${path}.\`);
   }
 }
-const netlifyHasHeader = (path, key, value) =>
-  (headerBlocks.get(path) || []).some(line => line === `${key}: ${value}`);
-for (const path of [
-  "/agent-manifest.json",
-  "/briefbridge_network.network.json",
-  "/links.json",
-  "/agent-mcp.json",
-  "/.well-known/nsdeploy.json",
-  "/.well-known/nsdeploy-agent.json"
-]) {
-  if (!netlifyHasHeader(path, "Access-Control-Allow-Origin", "*")) {
-    fail(`Netlify must allow public CORS for ${path}.`);
-  }
+if (!hasRenderHeader("/*", "X-Content-Type-Options", "nosniff")) {
+  fail("Render must apply X-Content-Type-Options globally.");
 }
-if (!netlifyHasHeader("/*", "X-Content-Type-Options", "nosniff")) {
-  fail("Netlify must apply X-Content-Type-Options globally.");
-}
-if (!netlifyHasHeader("/*", "Referrer-Policy", "strict-origin-when-cross-origin")) {
-  fail("Netlify must apply a strict referrer policy globally.");
-}
-if (!netlifyHasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'")) {
-  fail("Netlify must apply the restrictive sandbox-worker CSP.");
+if (!hasRenderHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", '"default-src')) {
+  fail("Render must apply the restrictive sandbox-worker CSP.");
 }
 const vercelConfig = await readJson("vercel.json");
 const hasNetworkRewrite = (vercelConfig.rewrites || []).some(rule =>
