@@ -30,7 +30,7 @@ The brief builder works without an AI key. To use the agents:
 
 1. Create an account at [otari.ai](https://otari.ai) and create an API key.
 2. Open **AI model settings** in the assistant.
-3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `alibaba/qwen3.8-flash`.
+3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/v1` and `mzai:moonshotai/Kimi-K2.6`.
 4. Select **Save and start**, then describe a project request.
 
 Do not paste API keys into GitHub, project files, screenshots or chat messages. The reference runtime keeps the BYOK setup in this browser and sends the key only to the configured router. Your messages and any page data the agents read are sent to the model provider you select. To clear the saved setup, use **Delete setup** in the AI model settings, then close the tab.
@@ -61,7 +61,7 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 - The model must support chat completions and tool calls.
 - The visitor can change the model or provider in the runtime's advanced settings.
 
-Hosted Otari supports browser requests. If you use a self-hosted Otari instance instead, add the exact website origin to `cors_allow_origins` and configure the browser settings with that instance's `/api/v1` endpoint.
+BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. If your browser reports a CORS error, the gateway must allow the BriefBridge origin for inference requests. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/v1` endpoint.
 
 ## Deploy
 
