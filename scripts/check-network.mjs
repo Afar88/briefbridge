@@ -16,7 +16,7 @@ if (entry?.hocon !== "./briefbridge_network.network.json") fail("The manifest mu
 const networkJson = await readJson("briefbridge_network.network.json");
 const hoconText = await readFile(resolve(root, "briefbridge_network.hocon"), "utf8");
 const hoconConfig = parseHocon(hoconText);
-if (JSON.stringify(hoconConfig, null, 2) + "\n" !== JSON.stringify(networkJson, null, 2) + "\n") {
+if (JSON.stringify(hoconConfig, null, 2) + "["main deployment branch", /branch:\s*main/]" !== JSON.stringify(networkJson, null, 2) + "\n") {
   fail("The HOCON source and published JSON are out of sync.");
 }
 const network = new AgentNetwork(hoconConfig, entry?.name || "briefbridge_network");
