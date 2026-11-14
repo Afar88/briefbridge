@@ -178,3 +178,12 @@ body>dialog button{margin-right:8px}
   .start-card,.button{transition:none}
   .start-card:hover,.button:hover{transform:none}
 }
+
+.optional-fields{border:1px solid var(--line);border-radius:12px;background:#121e2e;overflow:hidden}
+.optional-fields>summary{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:13px 15px;cursor:pointer;color:#e1e9f3;font-size:12px;font-weight:700;list-style-position:inside}
+.optional-fields>summary::marker{color:var(--lime)}
+.optional-fields>summary span{font-size:10px;font-weight:400;color:#8798ad}
+.optional-fields[open]>summary{border-bottom:1px solid var(--line);background:#19283b}
+.optional-fields-content{display:grid;gap:16px;padding:16px}
+.optional-fields-content .form-row{margin:0}
+@media(max-width:680px){.optional-fields-content{padding:13px}.optional-fields>summary{align-items:flex-start}}
