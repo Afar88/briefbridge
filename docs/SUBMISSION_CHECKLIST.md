@@ -2,6 +2,8 @@
 
 ## Technical
 
+**Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live on commit `101ecf6c695c5ecfc7a04b5f91fa3bea61386b7f`). The remaining browser, endpoint, CORS and Otari checks below still need hands-on verification.
+
 - [ ] Public HTTPS website is live and usable without a login.
 - [ ] `/agent-manifest.json` returns valid JSON.
 - [ ] `/briefbridge_network.network.json` returns valid JSON and matches the manifest's network entry.
@@ -11,7 +13,7 @@
 - [ ] A visitor can run the coordinator and specialist agents.
 - [ ] Save and delete actions require human confirmation.
 - [ ] A second origin can fetch the public manifest and network artifacts (CORS).
-- [ ] `npm run check` passes on the final commit.
+- [x] `npm run check` passes on the deployed commit (6 tests passed; 0 failed).
 - [ ] Test the deployed website in a current desktop browser and on a phone.
 
 ## Submission materials
