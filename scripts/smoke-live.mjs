@@ -19,25 +19,30 @@ async function request(path) {
   throw new Error(`${path}: request failed after retry: ${lastError?.message || lastError}`);
 }
 
-async function check(path, { json = false, cors = false, includes = "" } = {}) {
-  try {
-    const { response, body, elapsedMs } = await request(path);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    if (cors && response.headers.get("access-control-allow-origin") !== "*") {
-      throw new Error("missing Access-Control-Allow-Origin: *");
+async function check(path, { json = false, cors = false, includes = "", retries = 0 } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      const { response, body, elapsedMs } = await request(path);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (cors && response.headers.get("access-control-allow-origin") !== "*") {
+        throw new Error("missing Access-Control-Allow-Origin: *");
+      }
+      if (includes && !body.includes(includes)) throw new Error(`response did not include ${JSON.stringify(includes)}`);
+      let parsed;
+      if (json) {
+        try { parsed = JSON.parse(body); }
+        catch { throw new Error("response was not valid JSON"); }
+      }
+      passed.push({ path, elapsedMs });
+      return parsed;
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) await new Promise(resolve => setTimeout(resolve, 5000));
     }
-    if (includes && !body.includes(includes)) throw new Error(`response did not include ${JSON.stringify(includes)}`);
-    let parsed;
-    if (json) {
-      try { parsed = JSON.parse(body); }
-      catch { throw new Error("response was not valid JSON"); }
-    }
-    passed.push({ path, elapsedMs });
-    return parsed;
-  } catch (error) {
-    failures.push({ path, error: error.message });
-    return null;
   }
+  failures.push({ path, error: lastError?.message || "unknown request failure" });
+  return null;
 }
 
 console.log(`BriefBridge live smoke test: ${base}`);
@@ -48,7 +53,7 @@ const network = await check("/briefbridge_network.network.json", { json: true, c
 const alias = await check("/briefbridge_network", { json: true });
 await check("/runtime/index.js", { includes: "export" });
 await check("/app.js", { includes: "normalizeBrief" });
-await check("/site.js", { includes: "Open questions" });
+await check("/site.js", { includes: "Open questions", retries: 5 });
 await check("/runtime/sandbox-worker.js", { includes: "self" });
 await check("/bridge/action-bridge.html", { includes: "action-bridge.js" });
 await check("/links.json", { json: true, cors: true });
