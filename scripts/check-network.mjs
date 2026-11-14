@@ -73,6 +73,9 @@ for (const path of [
     fail("Render must allow public CORS for " + path + ".");
   }
 }
+if (!hasRenderHeader("/*", "Cache-Control", "no-cache")) {
+  fail("Render must revalidate static assets so updated app modules are not served stale.");
+}
 if (!hasRenderHeader("/*", "X-Content-Type-Options", "nosniff")) {
   fail("Render must apply X-Content-Type-Options globally.");
 }
@@ -99,6 +102,9 @@ for (const path of [
   if (!hasHeader(path, "Access-Control-Allow-Origin", "*")) {
     fail(`Vercel must allow public CORS for ${path}.`);
   }
+}
+if (!hasHeader("/(.*)", "Cache-Control", "no-cache")) {
+  fail("Vercel must revalidate static assets so updated app modules are not served stale.");
 }
 if (!hasHeader("/(.*)", "X-Content-Type-Options", "nosniff")) {
   fail("Vercel must apply X-Content-Type-Options globally.");
