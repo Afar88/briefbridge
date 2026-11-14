@@ -361,6 +361,20 @@ function init() {
         setFormValues(item.brief);
         persistDraft(item.brief);
         renderPreview(item.brief);
+        const optional = document.querySelector(".optional-fields");
+        if (optional) {
+          const b = item.brief;
+          optional.open = Boolean(
+            b.scope || b.timeline || b.budget ||
+            b.constraints?.length || b.assumptions?.length ||
+            b.openQuestions?.length || b.nextSteps?.length
+          );
+        }
+        const notice = document.querySelector("#form-notice");
+        notice.textContent = `Loaded “${item.brief.title}” into the editor. Review it before making changes.`;
+        notice.className = "notice success";
+        document.querySelector("#brief-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document.querySelector('#brief-form [name="title"]')?.focus({ preventScroll: true });
       }
     }
     if (remove) {
