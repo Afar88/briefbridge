@@ -37,6 +37,45 @@ if (!front?.tools?.includes("brief_architect")) fail("The coordinator must be ab
 for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
+const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");
+if (!/publish\s*=\s*"\."/m.test(netlifyConfig) || !/command\s*=\s*"npm run check"/m.test(netlifyConfig)) {
+  fail("Netlify must publish the repository root after running npm run check.");
+}
+const headerText = await readFile(resolve(root, "_headers"), "utf8");
+const headerBlocks = new Map();
+let currentPath = null;
+for (const line of headerText.split(/\r?\n/)) {
+  if (!line.trim() || line.trim().startsWith("#")) continue;
+  if (!/^\s/.test(line)) {
+    currentPath = line.trim();
+    headerBlocks.set(currentPath, []);
+  } else if (currentPath) {
+    headerBlocks.get(currentPath).push(line.trim());
+  }
+}
+const netlifyHasHeader = (path, key, value) =>
+  (headerBlocks.get(path) || []).some(line => line === `${key}: ${value}`);
+for (const path of [
+  "/agent-manifest.json",
+  "/briefbridge_network.network.json",
+  "/links.json",
+  "/agent-mcp.json",
+  "/.well-known/nsdeploy.json",
+  "/.well-known/nsdeploy-agent.json"
+]) {
+  if (!netlifyHasHeader(path, "Access-Control-Allow-Origin", "*")) {
+    fail(`Netlify must allow public CORS for ${path}.`);
+  }
+}
+if (!netlifyHasHeader("/*", "X-Content-Type-Options", "nosniff")) {
+  fail("Netlify must apply X-Content-Type-Options globally.");
+}
+if (!netlifyHasHeader("/*", "Referrer-Policy", "strict-origin-when-cross-origin")) {
+  fail("Netlify must apply a strict referrer policy globally.");
+}
+if (!netlifyHasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'")) {
+  fail("Netlify must apply the restrictive sandbox-worker CSP.");
+}
 const vercelConfig = await readJson("vercel.json");
 const hasNetworkRewrite = (vercelConfig.rewrites || []).some(rule =>
   rule.source === "/briefbridge_network" && rule.destination === "/briefbridge_network.network.json"
