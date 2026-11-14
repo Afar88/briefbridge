@@ -88,21 +88,26 @@
             </div>
             <div class="form-row">
               <label class="field"><span>Project type</span><select name="projectType"><option>Marketing</option><option>Branding</option><option>Web design</option><option>Software / product</option><option>Content creation</option><option>Event</option><option>Research</option><option>Other</option></select></label>
-              <label class="field"><span>Timeline</span><input name="timeline" maxlength="240" placeholder="e.g. 3 weeks from kickoff"></label>
-              <label class="field"><span>Budget</span><input name="budget" maxlength="160" placeholder="e.g. To be agreed"></label>
             </div>
             <label class="field"><span>What is the main objective? <b>*</b></span><textarea name="objective" rows="3" maxlength="1600" placeholder="What should this project achieve?" required></textarea></label>
             <label class="field"><span>Who is the target audience? <b>*</b></span><textarea name="audience" rows="2" maxlength="800" placeholder="Describe the people this work is for." required></textarea></label>
-            <label class="field"><span>What is included in the scope?</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Add background, boundaries or important context."></textarea></label>
-            <div class="form-row">
-              <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One deliverable per line" required></textarea><small>Be specific about what will be handed over.</small></label>
-              <label class="field"><span>Constraints / requirements</span><textarea name="constraints" rows="4" placeholder="One requirement per line"></textarea><small>Include dependencies, preferences or things to avoid.</small></label>
-            </div>
-            <div class="form-row">
-              <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One assumption per line"></textarea></label>
-              <label class="field"><span>Open questions</span><textarea name="openQuestions" rows="3" placeholder="What still needs an answer?"></textarea></label>
-            </div>
-            <label class="field"><span>Suggested next steps</span><textarea name="nextSteps" rows="2" placeholder="One next step per line"></textarea></label>
+            <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One deliverable per line" required></textarea><small>Be specific about what will be handed over.</small></label>
+            <details class="optional-fields">
+              <summary>Additional details <span>Optional · scope, timeline, budget and requirements</span></summary>
+              <div class="optional-fields-content">
+                <label class="field"><span>What is included in the scope?</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Add background, boundaries or important context."></textarea></label>
+                <div class="form-row">
+                  <label class="field"><span>Timeline</span><input name="timeline" maxlength="240" placeholder="e.g. 3 weeks from kickoff"></label>
+                  <label class="field"><span>Budget</span><input name="budget" maxlength="160" placeholder="e.g. To be agreed"></label>
+                </div>
+                <label class="field"><span>Constraints / requirements</span><textarea name="constraints" rows="3" placeholder="One requirement per line"></textarea><small>Include dependencies, preferences or things to avoid.</small></label>
+                <div class="form-row">
+                  <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One assumption per line"></textarea></label>
+                  <label class="field"><span>Open questions</span><textarea name="openQuestions" rows="3" placeholder="What still needs an answer?"></textarea></label>
+                </div>
+                <label class="field"><span>Suggested next steps</span><textarea name="nextSteps" rows="2" placeholder="One next step per line"></textarea></label>
+              </div>
+            </details>
             <div class="form-actions">
               <button class="button button-primary" type="submit">Save project brief <span>→</span></button>
               <button class="button button-outline" id="export-markdown" type="button" disabled>Export Markdown</button>
