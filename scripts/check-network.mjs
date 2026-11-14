@@ -108,6 +108,9 @@ if (!hasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default
 }
 if (manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") fail("The published default router should be hosted Mozilla Otari.");
 if (networkJson.llm_config?.model_name !== "mzai:moonshotai/Kimi-K2.6") fail("The default model must use the documented Otari managed-model selector.");
+const runtimeUi = await readFile(resolve(root, "runtime/ui.js"), "utf8");
+if (!runtimeUi.includes('model: "' + networkJson.llm_config.model_name + '"')) fail("The Otari settings preset must match the network's default managed model.");
+if (runtimeUi.includes("alibaba/qwen3.8-flash")) fail("The Otari preset must not use an unrelated provider's default model.");
 if (manifest.llm_router?.mock !== false) fail("The public network must not run in mock mode.");
 if (manifest.deployment?.mode !== "static") fail("The deployment mode must be static.");
 if (!manifest.actions?.module || !manifest.actions?.bridge) fail("The action module and bridge must be declared.");
