@@ -16,7 +16,7 @@ if (entry?.hocon !== "./briefbridge_network.network.json") fail("The manifest mu
 const networkJson = await readJson("briefbridge_network.network.json");
 const hoconText = await readFile(resolve(root, "briefbridge_network.hocon"), "utf8");
 const hoconConfig = parseHocon(hoconText);
-if (JSON.stringify(hoconConfig, null, 2) + "["main deployment branch", /branch:\s*main/]" !== JSON.stringify(networkJson, null, 2) + "\n") {
+if (JSON.stringify(hoconConfig, null, 2) + "\n" !== JSON.stringify(networkJson, null, 2) + "\n") {
   fail("The HOCON source and published JSON are out of sync.");
 }
 const network = new AgentNetwork(hoconConfig, entry?.name || "briefbridge_network");
@@ -58,7 +58,7 @@ for (const name of manifest.actions?.agentTools || []) {
 const renderConfig = await readFile(resolve(root, "render.yaml"), "utf8");
 for (const [label, pattern] of [
   ["static hosting runtime", /runtime:\s*static/],
-  ["current review branch", /branch:\s*build\/complete-mozilla-otari/],
+  ["main deployment branch", /branch:\s*main/],
   ["validation build", /buildCommand:\s*npm install && npm run check/],
   ["repository-root publish", /staticPublishPath:\s*\./],
   ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/]
