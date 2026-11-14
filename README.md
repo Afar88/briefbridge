@@ -26,6 +26,8 @@ npm run serve
 
 Open http://127.0.0.1:8080.
 
+To check the public deployment and discovery endpoints from your machine, run `npm run smoke`. It verifies the homepage, public JSON resources, network rewrite, runtime/bridge files, CORS headers and sandbox-worker CSP. It does not make an AI request or require an Otari key.
+
 The brief builder works without an AI key. To use the agents:
 
 1. Create an account at [otari.ai](https://otari.ai) and create an API key.
@@ -90,6 +92,7 @@ Netlify and Vercel configuration files are retained as secondary hosting fallbac
 - `site.js`: boots the browser runtime and presents human confirmation before save/delete actions.
 - `runtime/`: unmodified browser runtime files from [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web), under the included Apache-2.0 runtime license.
 - `scripts/check-network.mjs`: validates the published network and required files.
+- `scripts/smoke-live.mjs`: checks the live public site, discovery endpoints, CORS and sandbox headers.
 - `scripts/serve.mjs`: local static server with the CORS and worker headers needed for interoperability checks.
 
 ## Checks
