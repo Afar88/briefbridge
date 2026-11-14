@@ -32,7 +32,7 @@ The brief builder works without an AI key. To use the agents:
 
 1. Create an account at [otari.ai](https://otari.ai) and create an API key.
 2. Open **AI model settings** in the assistant.
-3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `nebius:moonshotai/Kimi-K2.6`. For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
+3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `mzai:moonshotai/Kimi-K2.6`. For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
 4. Select **Save and start**, then describe a project request.
 
 Do not paste API keys into GitHub, project files, screenshots or chat messages. The reference runtime keeps the BYOK setup in this browser and sends the key only to the configured router. Your messages and any page data the agents read are sent to the model provider you select. To clear the saved setup, use **Delete setup** in the AI model settings, then close the tab.
@@ -60,7 +60,7 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 
 - US-region router: `https://api.otari.ai/api/v1`
 - EU-region router: `https://eu.api.otari.ai/api/v1`
-- Default managed model: `nebius:moonshotai/Kimi-K2.6`
+- Default managed model: `mzai:moonshotai/Kimi-K2.6`
 - Choose a model that supports chat completions and tool calls.
 - The visitor can change the model or provider in the runtime's advanced settings.
 - Model usage may incur charges on the visitor's Otari account; use a key with a suitable budget and model restrictions.
