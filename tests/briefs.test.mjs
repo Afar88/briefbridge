@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeBrief, validateBrief, briefToMarkdown } from "../app.js";
+import { normalizeBrief, validateBrief, briefToMarkdown, parseBriefJson } from "../app.js";
 
 test("normalizes a complete project brief", () => {
   const result = validateBrief({
@@ -53,6 +53,27 @@ test("normalizes newline-separated lists and preserves commas within entries", (
   });
   assert.deepEqual(result.deliverables, ["Landing page, including responsive layouts", "Social content, with captions", "Email sequence"]);
   assert.deepEqual(result.constraints, ["No paid ads"]);
+});
+
+test("imports an exported JSON brief without changing its content", () => {
+  const source = {
+    title: "Campaign plan",
+    objective: "Increase qualified enquiries.",
+    audience: "Local business owners",
+    deliverables: ["Landing page copy", "Social content"],
+  };
+  const result = parseBriefJson(JSON.stringify(source));
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.brief.deliverables, source.deliverables);
+  assert.equal(result.brief.projectType, "Other");
+});
+
+test("rejects malformed or incomplete JSON imports", () => {
+  assert.equal(parseBriefJson("{").ok, false);
+  assert.equal(parseBriefJson("[]").ok, false);
+  const incomplete = parseBriefJson({ title: "Missing details" });
+  assert.equal(incomplete.ok, false);
+  assert.match(incomplete.reason, /objective/);
 });
 
 test("uses a safe project type when none is supplied", () => {
