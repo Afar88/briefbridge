@@ -37,6 +37,29 @@ if (!front?.tools?.includes("brief_architect")) fail("The coordinator must be ab
 for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
+const vercelConfig = await readJson("vercel.json");
+const headerRules = vercelConfig.headers || [];
+const hasHeader = (source, key, value) => headerRules.some(rule =>
+  rule.source === source && rule.headers?.some(header => header.key === key && header.value === value)
+);
+for (const path of [
+  "/agent-manifest.json",
+  "/briefbridge_network.network.json",
+  "/links.json",
+  "/agent-mcp.json",
+  "/.well-known/nsdeploy.json",
+  "/.well-known/nsdeploy-agent.json"
+]) {
+  if (!hasHeader(path, "Access-Control-Allow-Origin", "*")) {
+    fail(`Vercel must allow public CORS for ${path}.`);
+  }
+}
+if (!hasHeader("/(.*)", "X-Content-Type-Options", "nosniff")) {
+  fail("Vercel must apply X-Content-Type-Options globally.");
+}
+if (!hasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'")) {
+  fail("Vercel must apply the restrictive sandbox-worker CSP.");
+}
 if (manifest.llm_router?.base_url !== "https://api.otari.ai/v1") fail("The published default router should be hosted Mozilla Otari.");
 if (networkJson.llm_config?.model_name !== "mzai:moonshotai/Kimi-K2.6") fail("The default model must use the documented Otari managed-model selector.");
 if (manifest.llm_router?.mock !== false) fail("The public network must not run in mock mode.");
