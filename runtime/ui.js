@@ -313,8 +313,9 @@ export function mountApp(root, { engine, trace, manifest }) {
         <summary>Advanced settings (optional)</summary>
         <div class="ns-settings-advanced-body">
           <label>Setup name (optional) <input id="ns-profile-name" placeholder="Local model, Google AI Studio, Groq"></label>
-          <label><span id="ns-model-label">Model (optional)</span> <input id="ns-model" list="ns-model-options" placeholder="Uses this site's model"></label>
-          <datalist id="ns-model-options"></datalist>
+          <label><span id="ns-model-label">Available models</span> <select id="ns-model-select"><option value="">Load models from your provider</option></select></label>
+          <button id="ns-load-models" class="ghost" type="button">Load available models</button>
+          <label><span>Model ID (editable)</span> <input id="ns-model" placeholder="Select a model above or enter its exact ID"></label>
           <label>Provider URL (optional) <input id="ns-router" placeholder="Uses the configured default"></label>
           <div id="ns-router-hint" class="ns-hint"></div>
           <div class="ns-profile-actions">
@@ -937,7 +938,8 @@ export function mountApp(root, { engine, trace, manifest }) {
   const routerEl = root.querySelector("#ns-router");
   const keyEl = root.querySelector("#ns-key");
   const modelEl = root.querySelector("#ns-model");
-  const modelOptionsEl = root.querySelector("#ns-model-options");
+  const modelSelectEl = root.querySelector("#ns-model-select");
+  const loadModelsBtn = root.querySelector("#ns-load-models");
   const hintEl = root.querySelector("#ns-router-hint");
   const profileHintEl = root.querySelector("#ns-profile-hint");
   const saveProfileBtn = root.querySelector("#ns-save-profile");
@@ -1094,12 +1096,26 @@ export function mountApp(root, { engine, trace, manifest }) {
       const models = (Array.isArray(body?.data) ? body.data : [])
         .map((item) => normalizeModelName(item?.id))
         .filter(Boolean);
-      modelOptionsEl.innerHTML = "";
+      modelSelectEl.innerHTML = "";
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "Choose a model published by your provider";
+      modelSelectEl.appendChild(placeholder);
       for (const id of models) {
         const option = document.createElement("option");
         option.value = id;
-        modelOptionsEl.appendChild(option);
+        option.textContent = id;
+        modelSelectEl.appendChild(option);
       }
+      const current = normalizeModelName(modelEl.value);
+      if (current && models.includes(current)) modelSelectEl.value = current;
+      else if (models.length) {
+        modelSelectEl.value = models[0];
+        modelEl.value = models[0];
+      }
+      setProfileHint(models.length
+        ? `Loaded ${models.length} models from your provider. Choose one from the list.`
+        : "Your provider returned an empty model list. You can enter a model ID manually.");
       return models;
     } catch {
       // Not every OpenAI-compatible provider publishes a model catalog.
@@ -1132,9 +1148,9 @@ export function mountApp(root, { engine, trace, manifest }) {
   // Ask for a model. Mention the Model field's suggestions only when an earlier
   // /models lookup filled them; this adds no request of its own.
   const modelSetupMessage = () => {
-    const choice = modelOptionsEl.options.length
-      ? "Pick a suggested model in the Model field, or enter another model your provider supports"
-      : "Enter a model your provider supports in the Model field";
+    const choice = modelSelectEl.options.length > 1
+      ? "Choose a model from the Available models list, or enter another supported model ID"
+      : "Load available models, then choose one from the list or enter its exact ID";
     return `This site needs a model name before it can answer with your key. ${choice}, then select Save and start.`;
   };
   validateConfiguredModel = async (requireActiveKey = true) => {
@@ -1223,6 +1239,28 @@ export function mountApp(root, { engine, trace, manifest }) {
     refreshHint();
   });
   routerEl.addEventListener("input", refreshHint);
+  modelSelectEl.addEventListener("change", () => {
+    if (modelSelectEl.value) modelEl.value = modelSelectEl.value;
+    if (!profileNameEl.value.trim()) profileNameEl.value = guessByokProfileName({ router: routerEl.value, model: modelEl.value });
+    refreshHint();
+  });
+  loadModelsBtn.addEventListener("click", async () => {
+    const router = routerEl.value.trim() || byokRouter;
+    const key = keyEl.value.trim() || engine.byokKey || "";
+    if (!router || !key || key === "demo") {
+      setProfileHint("Enter your provider URL and API key first, then load available models.", "warn");
+      return;
+    }
+    loadModelsBtn.disabled = true;
+    loadModelsBtn.textContent = "Loading models…";
+    try {
+      const models = await fetchAvailableModels(router, key);
+      if (!models?.length) setProfileHint("Could not retrieve a model list from this provider. Check the API key, provider URL, and provider access to /models. You can still enter a model ID manually.", "warn");
+    } finally {
+      loadModelsBtn.disabled = false;
+      loadModelsBtn.textContent = "Load available models";
+    }
+  });
   modelEl.addEventListener("input", () => {
     const normalized = normalizeModelName(modelEl.value);
     if (normalized !== modelEl.value.trim() && normalized) modelEl.value = normalized;
