@@ -131,11 +131,23 @@ Your structured brief will appear here as you fill in the form.</pre>
         <p class="assistant-note">Your messages and any page data the assistant reads are sent to the AI provider you select. Your API key is saved in this browser’s local storage and sent only to the provider endpoint you configure. Use a private device and a key with a small spending limit; remove your saved setup before sharing the device. The manual brief builder works without an API key.</p>
         <p id="assistant-status" role="status">Loading the browser agent runtime… You can still use the brief builder if the assistant is unavailable.</p>
       </div>
+      <div class="assistant-guide" aria-label="How to start using the AI assistant">
+        <p class="assistant-guide-title">Start here — 3 simple steps</p>
+        <ol>
+          <li><strong>Connect your AI key:</strong> open the “Connect your AI provider” panel below and paste your Otari API key.</li>
+          <li><strong>Save and start:</strong> press the “Save and start” button inside that panel.</li>
+          <li><strong>Send a request:</strong> type what you want help with in the message box and press “Send”.</li>
+        </ol>
+        <p>Your API key is private. Enter it only in the password field on this page — never in the chat.</p>
+      </div>
       <div class="assistant-shell">
         <div id="agent-app">
           <div data-ns-slot="header"></div>
           <div class="assistant-panels"><div data-ns-slot="chat"></div><div data-ns-slot="agents"></div></div>
-          <div data-ns-slot="settings"></div>
+          <details class="assistant-settings">
+            <summary>Step 1: Connect your AI provider (API key)</summary>
+            <div data-ns-slot="settings"></div>
+          </details>
         </div>
       </div>
     </section>
