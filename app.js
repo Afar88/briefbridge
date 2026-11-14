@@ -129,7 +129,7 @@ export class App {
         purpose: "Turn project requests into clear, reviewable project briefs.",
         currentDraft: normalizeBrief(currentFormData()),
         savedBriefs,
-        availableActions: ["create a structured brief", "save a brief after confirmation", "export a brief as Markdown or JSON"],
+        availableActions: ["create a structured brief", "save a brief after confirmation", "export a brief as Markdown or JSON", "import a validated JSON brief"],
         limitations: ["BriefBridge does not sign contracts, collect payments, guarantee project budgets, or book services."],
       };
     },
@@ -140,9 +140,12 @@ export class App {
       const checked = validateBrief(input);
       if (!checked.ok) return { ok: false, reason: checked.reason };
       const items = readSaved();
+      if (items.length >= 50) {
+        return { ok: false, reason: "Your saved library is full (50 briefs). Export a copy or delete an older brief before saving another." };
+      }
       const record = { id: makeId(), createdAt: new Date().toISOString(), brief: checked.brief };
       items.unshift(record);
-      if (!writeSaved(items.slice(0, 50))) {
+      if (!writeSaved(items)) {
         return { ok: false, reason: "This browser could not save the brief. Check available storage and try again." };
       }
       window.dispatchEvent(new CustomEvent("briefbridge:saved", { detail: record }));
