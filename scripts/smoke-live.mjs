@@ -48,7 +48,7 @@ async function check(path, { json = false, cors = false, includes = "", retries 
 async function checkOtariPreflight() {
   const started = Date.now();
   try {
-    const response = await fetch("https://api.otari.ai/v1/chat/completions", {
+    const response = await fetch("https://api.otari.ai/api/v1/chat/completions", {
       method: "OPTIONS",
       headers: {
         Origin: base,
