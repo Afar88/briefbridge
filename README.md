@@ -65,7 +65,7 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 - The visitor can change the model or provider in the runtime's advanced settings.
 - Model usage may incur charges on the visitor's Otari account; use a key with a suitable budget and model restrictions.
 
-BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. **Current release gate:** the hosted endpoint returned HTTP 404 to our browser preflight from the BriefBridge origin, so direct BYOK inference is not yet verified. Otari must enable `cors_inference_origins` for this origin, or we must deploy a transparent relay. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/api/v1` endpoint. The manual brief builder remains available.
+BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. **Browser preflight:** the live smoke test now confirms that the hosted Otari endpoint allows the BriefBridge origin, POST, Authorization and Content-Type. A successful authenticated model request still needs to be tested with a visitor-owned key. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/api/v1` endpoint.
 
 ## Deploy on Render (primary hosting)
 
