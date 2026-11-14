@@ -2,9 +2,9 @@
 
 ## Technical
 
-**Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live on commit `101ecf6c695c5ecfc7a04b5f91fa3bea61386b7f`). The remaining browser, endpoint, CORS and Otari checks below still need hands-on verification.
+**Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live on commit `d6a53b90d43b839222e00a4b4c09eaa2a2996c7b`). The remaining browser, endpoint, CORS and Otari checks below still need hands-on verification.
 
-- [ ] Public HTTPS website is live and usable without a login.
+- [x] Public HTTPS homepage is live and opens without a login (owner smoke-tested).
 - [ ] `/agent-manifest.json` returns valid JSON.
 - [ ] `/briefbridge_network.network.json` returns valid JSON and matches the manifest's network entry.
 - [ ] `/runtime/index.js` loads in a browser.
