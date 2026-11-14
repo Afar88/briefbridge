@@ -56,9 +56,9 @@ The network URL is `https://YOUR-DOMAIN/briefbridge_network`. A caller loads the
 
 BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bring their own Otari key, so the website operator does not pay for their model calls and does not handle provider credentials.
 
-- Router: `https://api.otari.ai/api/v1`
-- Default model: `alibaba/qwen3.8-flash`
-- The model must support chat completions and tool calls.
+- Router: `https://api.otari.ai/v1`
+- Default managed model: `mzai:moonshotai/Kimi-K2.6`
+- Choose a model that supports chat completions and tool calls.
 - The visitor can change the model or provider in the runtime's advanced settings.
 
 BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. If your browser reports a CORS error, the gateway must allow the BriefBridge origin for inference requests. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/v1` endpoint.
