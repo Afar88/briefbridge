@@ -128,7 +128,7 @@ if (!hasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default
   fail("Vercel must apply the restrictive sandbox-worker CSP.");
 }
 if (manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") fail("The published default router should be hosted Mozilla Otari.");
-if (networkJson.llm_config?.model_name !== "mzai:moonshotai/Kimi-K2.6") fail("The default model must use the documented Otari managed-model selector.");
+if (networkJson.llm_config?.model_name !== "alibaba/qwen3.5-397b-a17b") fail("The default model must match the model confirmed in the Otari available-model list.");
 const runtimeUi = await readFile(resolve(root, "runtime/ui.js"), "utf8");
 if (!runtimeUi.includes('model: "' + networkJson.llm_config.model_name + '"')) fail("The Otari settings preset must match the network's default managed model.");
 if (runtimeUi.includes("alibaba/qwen3.8-flash")) fail("The Otari preset must not use an unrelated provider's default model.");
