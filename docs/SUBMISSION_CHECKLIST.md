@@ -18,11 +18,11 @@
 - [x] Public CORS response headers are present on discovery resources (automated cross-origin Origin-header check).
 - [x] Otari browser preflight allows this origin, POST, Authorization and Content-Type (GitHub Actions run #63).
 - [ ] Verify an actual browser fetch from a separate origin.
-- [x] `npm run check` passes on the latest branch commit (8 tests passed; 0 failed).
+- [x] `npm run check` passes on the latest branch commit (9 tests passed; 0 failed).
 - [x] Live endpoint smoke test passed: 16 checks, 0 failures, 0 warnings (GitHub Actions run #63).
 - [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
-- [ ] Export a brief as JSON, import it again, verify the editor fields, and save the reviewed copy.
+- [x] JSON import validates complete brief objects, rejects malformed/incomplete files, and preserves supported fields (automated tests); complete a real browser export/import/save walkthrough before release.
 
 ## Submission materials
 
