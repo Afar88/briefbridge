@@ -11,11 +11,11 @@
 - [x] `/briefbridge_network` resolves the published network.
 - [ ] A visitor can configure an Otari key in AI model settings.
 - [ ] A visitor can run the coordinator and specialist agents.
-- [ ] Save and delete actions require human confirmation.
+- [ ] Agent-driven save and delete actions require human confirmation.
 - [x] Public CORS response headers are present on discovery resources (automated cross-origin Origin-header check).
 - [ ] Verify an actual browser fetch from a separate origin.
 - [x] `npm run check` passes on the latest branch commit (6 tests passed; 0 failed).
-- [x] Live endpoint smoke test passed: 11 checks, 0 failures (GitHub Actions run #10).
+- [x] Live endpoint smoke test passed: 13 checks, 0 failures (GitHub Actions run #16).
 - [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
 
