@@ -21,14 +21,21 @@ function detailsFor(item) {
     const check = App.page.checkSaveBrief(item.arguments);
     if (!check.ok) return { refusal: check.reason };
     const b = check.brief;
+    const list = items => items.length ? items.join("; ") : "Not specified";
     return {
       "Project": b.title,
       "Client": b.client || "Not specified",
       "Type": b.projectType,
       "Objective": b.objective,
-      "Deliverables": b.deliverables.join("; "),
+      "Audience": b.audience,
+      "Scope": b.scope || "Not specified",
+      "Deliverables": list(b.deliverables),
+      "Constraints": list(b.constraints),
       "Timeline": b.timeline || "Not specified",
       "Budget": b.budget || "Not specified",
+      "Assumptions": list(b.assumptions),
+      "Open questions": list(b.openQuestions),
+      "Next steps": list(b.nextSteps),
     };
   }
   if (item.action === "delete_brief") {
