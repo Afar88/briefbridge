@@ -36,7 +36,7 @@ export const API_KEY_PROVIDERS = [
     name: "Otari",
     keyUrl: "https://otari.ai/dashboard#/keys",
     router: "https://api.otari.ai/api/v1",
-    model: "alibaba/qwen3.5-397b-a17b",
+    model: "inclusionai/ling-3.0-flash-vl",
     keyPrefixes: ["otk_"],
     accessNote: "Billing may be required",
   },
@@ -1108,18 +1108,16 @@ export function mountApp(root, { engine, trace, manifest }) {
         modelSelectEl.appendChild(option);
       }
       const current = normalizeModelName(modelEl.value);
-      if (current && models.includes(current)) {
-        modelSelectEl.value = current;
-      } else {
-        // A model catalogue is not a compatibility or billing guarantee. Never
-        // silently replace the configured model with the first arbitrary entry:
-        // gateways may publish models that cannot be metered for chat completion.
-        modelSelectEl.value = "";
-      }
+      const preferred = formProvider?.name === "Otari" ? "inclusionai/ling-3.0-flash-vl" : "";
+      const selected = current && models.includes(current)
+        ? current
+        : preferred && models.includes(preferred) ? preferred : "";
+      modelSelectEl.value = selected;
+      if (selected) modelEl.value = selected;
       setProfileHint(models.length
-        ? (current && models.includes(current)
-          ? `Loaded ${models.length} models. Current model is listed; confirm it supports chat completions and your provider's billing rules.`
-          : `Loaded ${models.length} models. Your current model was kept unchanged. Choose a chat-completion model you know is supported and billable; catalogue order is not a recommendation.`)
+        ? (selected
+          ? `Loaded ${models.length} models and selected ${selected}. The catalogue confirms it is published; provider billing and chat-completion support still need verification.`
+          : `Loaded ${models.length} models, but no verified preferred model was found. Nothing was selected automatically; choose a model only if your provider confirms it supports chat completions and billing.`)
         : "Your provider returned an empty model list. You can enter a model ID manually.");
       return models;
     } catch {
@@ -1257,13 +1255,13 @@ export function mountApp(root, { engine, trace, manifest }) {
       return;
     }
     loadModelsBtn.disabled = true;
-    loadModelsBtn.textContent = "Loading models…";
+    loadModelsBtn.textContent = "Finding a suitable model…";
     try {
       const models = await fetchAvailableModels(router, key);
-      if (!models?.length) setProfileHint("Could not retrieve a model list from this provider. Check the API key, provider URL, and provider access to /models. You can still enter a model ID manually.", "warn");
+      if (!models?.length) setProfileHint("Could not retrieve a model list from this provider. Automatic selection is unavailable; check the API key and provider URL, then choose a verified model manually.", "warn");
     } finally {
       loadModelsBtn.disabled = false;
-      loadModelsBtn.textContent = "Load available models";
+      loadModelsBtn.textContent = "Find a suitable model";
     }
   });
   modelEl.addEventListener("input", () => {
