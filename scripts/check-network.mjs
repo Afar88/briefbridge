@@ -37,7 +37,8 @@ if (!front?.tools?.includes("brief_architect")) fail("The coordinator must be ab
 for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
-if (manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") fail("The published default router should be hosted Mozilla Otari.");
+if (manifest.llm_router?.base_url !== "https://api.otari.ai/v1") fail("The published default router should be hosted Mozilla Otari.");
+if (networkJson.llm_config?.model_name !== "mzai:moonshotai/Kimi-K2.6") fail("The default model must use the documented Otari managed-model selector.");
 if (manifest.llm_router?.mock !== false) fail("The public network must not run in mock mode.");
 if (manifest.deployment?.mode !== "static") fail("The deployment mode must be static.");
 if (!manifest.actions?.module || !manifest.actions?.bridge) fail("The action module and bridge must be declared.");
