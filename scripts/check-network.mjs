@@ -37,6 +37,29 @@ if (!front?.tools?.includes("brief_architect")) fail("The coordinator must be ab
 for (const name of manifest.actions?.agentTools || []) {
   if (!front?.instructions?.includes(`website_${name}`)) fail(`Coordinator instructions do not mention website_${name}.`);
 }
+const renderConfig = await readFile(resolve(root, "render.yaml"), "utf8");
+for (const [label, pattern] of [
+  ["free static hosting", /runtime:\s*static[\s\S]*?plan:\s*free/],
+  ["current review branch", /branch:\s*build\/complete-mozilla-otari/],
+  ["validation build", /buildCommand:\s*npm install && npm run check/],
+  ["repository-root publish", /staticPublishPath:\s*\./],
+  ["network rewrite", /source:\s*\/briefbridge_network[\s\S]*?destination:\s*\/briefbridge_network\.network\.json/],
+  ["worker CSP", /path:\s*\/runtime\/sandbox-worker\.js[\s\S]*?name:\s*Content-Security-Policy/]
+]) {
+  if (!pattern.test(renderConfig)) fail(`Render must configure ${label}.`);
+}
+for (const path of [
+  "/agent-manifest.json",
+  "/briefbridge_network.network.json",
+  "/links.json",
+  "/agent-mcp.json",
+  "/.well-known/nsdeploy.json",
+  "/.well-known/nsdeploy-agent.json"
+]) {
+  const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");");
+  const rule = new RegExp(`path:\\s*${escaped}[\\s\\S]*?name:\\s*Access-Control-Allow-Origin[\\s\\S]*?value:\\s*["']?\\*["']?`);
+  if (!rule.test(renderConfig)) fail(`Render must allow public CORS for ${path}.`);
+}
 const netlifyConfig = await readFile(resolve(root, "netlify.toml"), "utf8");
 if (!/publish\s*=\s*"\."/m.test(netlifyConfig) || !/command\s*=\s*"npm run check"/m.test(netlifyConfig)) {
 if (!/from\s*=\s*"\/briefbridge_network"/m.test(netlifyConfig) ||
