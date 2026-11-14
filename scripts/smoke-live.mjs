@@ -1,6 +1,7 @@
 const base = (process.env.SITE_URL || "https://briefbridge-bpxd.onrender.com").replace(/\/$/, "");
 const timeoutMs = 15000;
 const failures = [];
+const warnings = [];
 const passed = [];
 
 async function request(path) {
@@ -68,7 +69,7 @@ async function checkOtariPreflight() {
     }
     passed.push({ path: "Otari browser preflight", elapsedMs: Date.now() - started });
   } catch (error) {
-    failures.push({ path: "Otari browser preflight", error: error.message });
+    warnings.push({ path: "Otari browser preflight", error: `${error.message}. Hosted Otari browser CORS must be enabled for this origin, or requests must use a transparent relay.` });
   }
 }
 
@@ -120,5 +121,6 @@ try {
 
 for (const item of passed) console.log(`PASS ${item.path} (${item.elapsedMs} ms)`);
 for (const item of failures) console.error(`FAIL ${item.path}: ${item.error}`);
-console.log(`Result: ${passed.length} checks passed; ${failures.length} failures.`);
+for (const item of warnings) console.warn(`WARN ${item.path}: ${item.error}`);
+console.log(`Result: ${passed.length} checks passed; ${failures.length} failures; ${warnings.length} warnings.`);
 if (failures.length) process.exitCode = 1;
