@@ -7,6 +7,7 @@
 // imposes layout, not brand.
 
 import { ChatMessageType } from "./kernel.js";
+import { selectAutomaticChatModel } from "./model-selection.js";
 import {
   canUseByokCookie,
   deleteByokProfile,
@@ -36,7 +37,7 @@ export const API_KEY_PROVIDERS = [
     name: "Otari",
     keyUrl: "https://otari.ai/dashboard#/keys",
     router: "https://api.otari.ai/api/v1",
-    model: "inclusionai/ling-3.0-flash-vl",
+    model: "alibaba/qwen3.5-397b-a17b",
     keyPrefixes: ["otk_"],
     accessNote: "Billing may be required",
   },
@@ -1093,7 +1094,8 @@ export function mountApp(root, { engine, trace, manifest }) {
       });
       if (!response.ok) return null;
       const body = await response.json();
-      const models = (Array.isArray(body?.data) ? body.data : [])
+      const catalog = Array.isArray(body?.data) ? body.data : [];
+      const models = catalog
         .map((item) => normalizeModelName(item?.id))
         .filter(Boolean);
       modelSelectEl.innerHTML = "";
@@ -1108,17 +1110,18 @@ export function mountApp(root, { engine, trace, manifest }) {
         modelSelectEl.appendChild(option);
       }
       const current = normalizeModelName(modelEl.value);
-      const preferred = formProvider?.name === "Otari" ? "inclusionai/ling-3.0-flash-vl" : "";
-      const selected = current && models.includes(current)
-        ? current
-        : preferred && models.includes(preferred) ? preferred : "";
+      const preferred = formProvider?.name === "Otari"
+        ? ["alibaba/qwen3.5-397b-a17b", "inclusionai/ling-3.0-flash-vl"]
+        : [];
+      const selectedModel = selectAutomaticChatModel(catalog, [current, ...preferred].filter(Boolean));
+      const selected = selectedModel?.id || "";
       modelSelectEl.value = selected;
       if (selected) modelEl.value = selected;
       setProfileHint(models.length
         ? (selected
-          ? `Loaded ${models.length} models and selected ${selected}. The catalogue confirms it is published; provider billing and chat-completion support still need verification.`
-          : `Loaded ${models.length} models, but no verified preferred model was found. Nothing was selected automatically; choose a model only if your provider confirms it supports chat completions and billing.`)
-        : "Your provider returned an empty model list. You can enter a model ID manually.");
+          ? `Checked ${models.length} published models and selected ${selected}. It is listed as a priced chat model with tool support.`
+          : `Loaded ${models.length} models, but none is explicitly marked as a priced chat model with tool support. Nothing was selected; check your provider's model settings.`)
+        : "Your provider returned an empty model list. Automatic selection is unavailable.");
       return models;
     } catch {
       // Not every OpenAI-compatible provider publishes a model catalog.
