@@ -4,7 +4,7 @@
 
 ## Technical
 
-**Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live from the current feature branch; see deploy history for the exact source commit). The remaining browser and Otari checks below still need hands-on verification.
+**Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live from the current feature branch; see deploy history for the exact source commit). The authenticated Otari request and real-browser integration checks below still need hands-on verification.
 
 - [x] Public HTTPS homepage is live and opens without a login (owner smoke-tested).
 - [x] `/agent-manifest.json` returns valid JSON.
@@ -12,12 +12,12 @@
 - [x] `/runtime/index.js` is publicly accessible.
 - [x] `/briefbridge_network` resolves the published network.
 - [ ] A visitor can configure an Otari key in AI model settings.
-- [ ] A visitor can run the coordinator and specialist agents.
+- [ ] A visitor can run the coordinator and specialist agents with a real Otari key (authenticated inference not yet tested).
 - [ ] Agent-driven save and delete actions require human confirmation.
 - [x] Public CORS response headers are present on discovery resources (automated cross-origin Origin-header check).
-- [ ] Verify an actual browser fetch from a separate origin.
+- [x] Otari browser preflight allows this origin, POST, Authorization and Content-Type (GitHub Actions run #29).\n- [ ] Verify an actual browser fetch from a separate origin.
 - [x] `npm run check` passes on the latest branch commit (6 tests passed; 0 failed).
-- [x] Live endpoint smoke test passed: 13 checks, 0 failures (GitHub Actions run #16).
+- [x] Live endpoint smoke test passed: 14 checks, 0 failures, 0 warnings (GitHub Actions run #29).
 - [ ] Daily 09:00 Lagos monitor activates after this workflow reaches the default branch.
 - [ ] Test the deployed website in a current desktop browser and on a phone.
 
