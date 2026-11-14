@@ -1,5 +1,7 @@
 # Open Agentic Web Challenge submission checklist
 
+**Submission deadline:** January 11, 2027, 8:00 a.m. Pacific Time (16:00 UTC). Keep the public project available free of charge through the judging period, which ends January 18, 2027, at 5:00 p.m. Pacific Time.
+
 ## Technical
 
 **Current deployment:** https://briefbridge-bpxd.onrender.com (Render reports the deployment live from the current feature branch; see deploy history for the exact source commit). The remaining browser and Otari checks below still need hands-on verification.
