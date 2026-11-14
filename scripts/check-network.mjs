@@ -50,17 +50,20 @@ for (const [label, pattern] of [
 if (/^\s+plan:/m.test(renderConfig)) {
   fail("Render static sites use the platform's default static-site plan; do not set a service plan.");
 }
-const renderHeaderBlock = path => {
+const renderHeaderBlocks = path => {
   const marker = "      - path: " + path;
-  const index = renderConfig.indexOf(marker);
-  if (index < 0) return "";
-  const next = renderConfig.indexOf("\n      - path:", index + marker.length);
-  return renderConfig.slice(index, next < 0 ? renderConfig.length : next);
+  const blocks = [];
+  let index = 0;
+  while ((index = renderConfig.indexOf(marker, index)) >= 0) {
+    const next = renderConfig.indexOf("\n      - path:", index + marker.length);
+    blocks.push(renderConfig.slice(index, next < 0 ? renderConfig.length : next));
+    index += marker.length;
+  }
+  return blocks;
 };
-const hasRenderHeader = (path, name, value) => {
-  const block = renderHeaderBlock(path);
-  return block.includes("name: " + name) && block.includes("value: " + value);
-};
+const hasRenderHeader = (path, name, value) => renderHeaderBlocks(path).some(block =>
+  block.includes("name: " + name) && block.includes("value: " + value)
+);
 for (const path of [
   "/agent-manifest.json",
   "/briefbridge_network.network.json",
