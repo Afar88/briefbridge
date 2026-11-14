@@ -1,19 +1,3 @@
-## Deploy on Netlify
-
-BriefBridge is a static site. Netlify is the primary hosting target because the repository already includes `netlify.toml` and `_headers`, which preserve the security and cross-origin headers required by Open Agentic Web discovery.
-
-1. Import `Afar88/briefbridge` into [Netlify](https://app.netlify.com/).
-2. Set the production branch to `main`; for the current review build, use the `build/complete-mozilla-otari` branch as a Deploy Preview or branch deploy.
-3. Keep the base directory empty (repository root). The checked-in `netlify.toml` configures the build command as `npm run check`, publish directory as `.`, and Node.js as `22`.
-4. Allow the first deploy to finish, then verify that the site is publicly accessible.
-5. Verify that `/agent-manifest.json` and `/briefbridge_network.network.json` return successfully with `Access-Control-Allow-Origin: *`.
-6. Verify that `/runtime/sandbox-worker.js` is served with the restrictive Content Security Policy required by the coded-tool sandbox.
-7. Test the assistant with your own Otari key and check the network URL from a second browser or agentic site.
-
-The `_headers` file applies global security headers, public CORS to discovery/network artifacts, and the required worker CSP. The `netlify.toml` also maps the public network URL `/briefbridge_network` to `/briefbridge_network.network.json`.
-
-Vercel configuration is retained as a secondary hosting option in `vercel.json`. Netlify is the selected primary platform for this release.
-
 # BriefBridge
 
 **Clarity before the work begins.** BriefBridge turns scattered project requests into clear, reviewable project briefs that clients, creatives and small teams can work from.
@@ -79,7 +63,7 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 
 BriefBridge calls the hosted Otari OpenAI-compatible endpoint directly from the browser. If your browser reports a CORS error, the gateway must allow the BriefBridge origin for inference requests. For a self-hosted gateway, set `cors_inference_origins` to the exact website origin and use that gateway's `/v1` endpoint.
 
-## Deploy on Render
+## Deploy on Render (primary hosting)
 
 BriefBridge is a static site; it does not need a server process, database, or runtime secrets. The repository's `render.yaml` is the deployment blueprint.
 
@@ -94,7 +78,7 @@ BriefBridge is a static site; it does not need a server process, database, or ru
 
 The Render blueprint configures the public network rewrite, discovery CORS headers, global content-type/referrer headers, and the sandbox worker CSP. It deliberately does not set `X-Frame-Options` or a frame-blocking CSP on `/bridge/`; other agent sites need to load the bridge.
 
-The `netlify.toml` and `_headers` files remain available as a secondary static-hosting fallback. `vercel.json` is retained for the existing Vercel project but is not required by Render.
+Netlify and Vercel configuration files are retained as secondary hosting fallbacks. Render is the selected primary platform for this release.
 
 ## Architecture
 
