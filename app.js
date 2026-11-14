@@ -56,7 +56,7 @@ function validateInputLimits(input = {}) {
   const listFields = ["deliverables", "constraints", "assumptions", "openQuestions", "nextSteps"];
   for (const field of listFields) {
     const value = input[field];
-    const items = Array.isArray(value) ? value : String(value ?? "").split(/\\r?\\n/);
+    const items = Array.isArray(value) ? value : String(value ?? "").split(/\r?\n/);
     const nonEmpty = items.map(item => String(item ?? "").trim()).filter(Boolean);
     if (nonEmpty.length > 12) {
       return `${field} can contain at most 12 items. Remove or combine items before saving or importing.`;
