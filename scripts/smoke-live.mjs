@@ -9,7 +9,7 @@ async function request(path) {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const started = Date.now();
     try {
-      const response = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(timeoutMs) });
+      const response = await fetch(url, { redirect: "follow", headers: { Origin: "https://briefbridge-smoke.invalid" }, signal: AbortSignal.timeout(timeoutMs) });
       const body = await response.text();
       return { response, body, elapsedMs: Date.now() - started, url };
     } catch (error) {
@@ -42,7 +42,7 @@ async function check(path, { json = false, cors = false, includes = "" } = {}) {
 
 console.log(`BriefBridge live smoke test: ${base}`);
 
-const home = await check("/", { includes: "BriefBridge" });
+await check("/", { includes: "BriefBridge" });
 const manifest = await check("/agent-manifest.json", { json: true, cors: true });
 const network = await check("/briefbridge_network.network.json", { json: true, cors: true });
 const alias = await check("/briefbridge_network", { json: true });
