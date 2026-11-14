@@ -18,7 +18,7 @@
     <nav aria-label="Main navigation">
       <a href="#workspace">Workspace</a>
       <a href="#assistant">AI assistant</a>
-      <a href="#how-it-works">How it works</a>
+      <a href="#saved-library">Saved briefs</a>
     </nav>
     <a class="topbar-cta" href="#workspace">Create a brief <span aria-hidden="true">↗</span></a>
   </header>
@@ -62,10 +62,22 @@
 
     <section class="workspace-section" id="workspace">
       <div class="section-heading">
-        <div><div class="eyebrow">YOUR WORKSPACE</div><h2>Build a better starting point.</h2><p>Capture what you know now. You can refine the details as the project becomes clearer.</p></div>
+        <div><div class="eyebrow">YOUR WORKSPACE</div><h2>What would you like to do?</h2><p>Start with a rough idea or build a structured brief yourself. You can switch paths whenever you need.</p></div>
         <button class="text-button" id="fill-example" type="button">Load a sample brief <span>↗</span></button>
       </div>
 
+      <div class="workspace-start" aria-label="Choose how to create a brief">
+        <a class="start-card start-card-primary" href="#brief-form">
+          <span class="start-card-icon" aria-hidden="true">✳</span>
+          <span class="start-card-copy"><strong>Build a brief manually</strong><small>Fill in the details at your own pace. No AI key required.</small></span>
+          <span class="start-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="start-card" href="#assistant">
+          <span class="start-card-icon" aria-hidden="true">✦</span>
+          <span class="start-card-copy"><strong>Start with AI</strong><small>Describe your idea and let BriefBridge help shape the brief.</small></span>
+          <span class="start-card-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
       <div class="workspace-grid">
         <section class="builder-panel">
           <div class="panel-heading"><div><span class="panel-index">01 / INTAKE</span><h3>Project details</h3></div><span class="panel-state">Autosaves in this browser</span></div>
@@ -112,8 +124,8 @@
 
 Your structured brief will appear here as you fill in the form.</pre>
           </section>
-          <section class="saved-panel">
-            <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3>Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
+          <section class="saved-panel" id="saved-library" aria-labelledby="saved-library-heading">
+            <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3 id="saved-library-heading">Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
             <div id="saved-briefs" class="saved-list"><p class="empty-state">Your saved briefs will appear here.</p></div>
             <p class="saved-footnote">Saved locally in this browser. Export a copy to share or back it up.</p>
           </section>
