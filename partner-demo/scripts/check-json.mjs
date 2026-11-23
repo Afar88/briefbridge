@@ -60,7 +60,8 @@ for (const path of [
 }
 assert.ok(render.includes("Access-Control-Allow-Origin"));
 assert.ok(render.includes("value: \"*\""));
-assert.ok(/source: \/shopstart_network[\\s\\S]*?destination: \/shopstart_network\\.network\\.json/.test(render), "Render must rewrite the public network URL");
+assert.ok(render.includes("source: /shopstart_network"), "Render must rewrite the public network URL");
+assert.ok(render.includes("destination: /shopstart_network.network.json"), "Render rewrite target must be the network JSON");
 
 console.log("ShopStart JSON and network checks passed.");
 console.log("Network: shopstart_network; front agent: shopstart_coordinator.");
