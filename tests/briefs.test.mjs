@@ -154,3 +154,68 @@ test("handles non-object validation input without crashing", () => {
 test("uses a safe project type when none is supplied", () => {
   assert.equal(normalizeBrief({ title: "Test" }).projectType, "Other");
 });
+
+test("maps free-text project types to the closest dropdown option", async () => {
+  const { mapProjectTypeOption } = await import("../app.js");
+  assert.equal(mapProjectTypeOption("Branding + Web Design"), "Web design");
+  assert.equal(mapProjectTypeOption("branding"), "Branding");
+  assert.equal(mapProjectTypeOption("mobile app"), "Software / product");
+  assert.equal(mapProjectTypeOption(""), "");
+});
+
+test("parses a complete brief written in chat text", async () => {
+  const { parseBriefText } = await import("../app.js");
+  const reply = [
+    "# Bakery website",
+    "**Project type:** Web design",
+    "",
+    "## Objective",
+    "Launch a one-page website for a small bakery in Lagos.",
+    "",
+    "## Target audience",
+    "Local customers and event planners.",
+    "",
+    "## Deliverables",
+    "- Logo",
+    "- One-page website",
+    "",
+    "## Budget",
+    "About $300",
+  ].join("\n");
+  const brief = parseBriefText(reply);
+  assert.ok(brief);
+  assert.equal(brief.title, "Bakery website");
+  assert.equal(brief.projectType, "Web design");
+  assert.match(brief.objective, /one-page website/);
+  assert.deepEqual(brief.deliverables, ["Logo", "One-page website"]);
+  assert.equal(brief.budget, "About $300");
+});
+
+test("ignores ordinary chat replies without a complete brief", async () => {
+  const { parseBriefText } = await import("../app.js");
+  assert.equal(parseBriefText("Sure! What is your budget?"), null);
+  assert.equal(parseBriefText("## Objective\nOnly one section, nothing else."), null);
+});
+
+test("detects clear save and delete requests, never negated ones", async () => {
+  const { asksToSaveBrief, asksToDeleteBrief } = await import("../app.js");
+  assert.equal(asksToSaveBrief("Please fill in the brief form and save the brief to my library."), true);
+  assert.equal(asksToSaveBrief("Yes, save it."), true);
+  assert.equal(asksToSaveBrief("Don't save this brief yet."), false);
+  assert.equal(asksToSaveBrief("I need a logo for my bakery."), false);
+  assert.equal(asksToDeleteBrief("Now please delete that saved brief from my library."), true);
+  assert.equal(asksToDeleteBrief("Do not delete my brief."), false);
+  assert.equal(asksToDeleteBrief("Please save the brief."), false);
+});
+
+test("drafts a valid brief from a plain save request", async () => {
+  const { draftFromRequest } = await import("../app.js");
+  const brief = draftFromRequest("I need a logo and a one-page website for my small bakery in Lagos. Budget about $300, ready in three weeks. Please fill in the brief form and save the brief.");
+  assert.ok(brief);
+  assert.deepEqual(brief.deliverables, ["Logo", "One-page website"]);
+  assert.equal(brief.title, "Logo and One-page website for small bakery in Lagos");
+  assert.equal(brief.budget, "Budget about $300");
+  assert.equal(brief.timeline, "Ready in three weeks");
+  assert.equal(brief.objective.includes("save"), false);
+  assert.equal(draftFromRequest("Please save the brief now."), null);
+});

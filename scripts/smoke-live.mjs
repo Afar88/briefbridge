@@ -85,6 +85,7 @@ await check("/app.js", { includes: "normalizeBrief" });
 await check("/app.js", { includes: "parseBriefJson", retries: 5 });
 await check("/index.html", { includes: 'id="import-json"', retries: 5 });
 await check("/site.js", { includes: "Open questions", retries: 5 });
+await check("/site-actions.js", { includes: "fill_brief_form", retries: 5 });
 await check("/runtime/sandbox-worker.js", { includes: "self" });
 await check("/bridge/action-bridge.html", { includes: "action-bridge.js" });
 await check("/links.json", { json: true, cors: true });
@@ -113,8 +114,8 @@ if (manifest && manifest.llm_router?.mock !== false) {
 if (manifest && manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") {
   failures.push({ path: "/agent-manifest.json", error: "default Otari router base URL is not the current hosted OpenAI-compatible endpoint" });
 }
-if (network && network.llm_config?.model_name !== "alibaba/qwen3.5-397b-a17b") {
-  failures.push({ path: "/briefbridge_network.network.json", error: "network model selector is not the current Otari managed-catalog selector" });
+if (network && network.llm_config?.model_name) {
+  failures.push({ path: "/briefbridge_network.network.json", error: "network must not hard-code a model; the visitor's provider setup chooses it" });
 }
 
 try {

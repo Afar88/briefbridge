@@ -75,6 +75,42 @@ export function selectByokProfile(id) {
   return nextStore;
 }
 
+// True when this tab's applied setup (session storage) is the given profile.
+// The router item marks an applied setup; its absence means this tab uses the
+// saved profile directly, which loadTabByokSetup would report as a fallback.
+function tabSetupMatches(profile) {
+  let key = "";
+  let router = null;
+  let model = "";
+  try {
+    key = sessionStorage.getItem(TAB_KEY_ITEM) || "";
+    router = sessionStorage.getItem(TAB_ROUTER_ITEM);
+    model = sessionStorage.getItem(TAB_MODEL_ITEM) || "";
+  } catch {}
+  if (router === null) return false;
+  if (!profile?.key || key !== profile.key) return false;
+  const strip = (url) => String(url || "").replace(/\/+$/, "");
+  const tabRouter = strip(resolveByokRouter(router));
+  const profileRouter = strip(resolveByokRouter(profile.router || ""));
+  if (tabRouter !== profileRouter) return false;
+  return normalizeModelName(model) === normalizeModelName(profile.model);
+}
+
+// Delete one saved setup. When the deleted profile is the setup this tab is
+// using, the tab's session copy of the key goes with it, so no key copy
+// survives the deletion. Returns the updated store and what was cleared.
+export function deleteByokProfileAndTabSetup(id) {
+  const store = loadByokStore();
+  const profile = store.profiles.find((p) => p.id === id) || null;
+  const nextStore = deleteByokProfile(id);
+  let clearedTab = false;
+  if (profile && tabSetupMatches(profile)) {
+    clearTabByokSetup();
+    clearedTab = true;
+  }
+  return { store: nextStore, profile, clearedTab };
+}
+
 export function guessByokProfileName({ router, model } = {}) {
   const hay = `${router || ""} ${model || ""}`.toLowerCase();
   if (/localhost|127\.0\.0\.1|\[::1\]|:11434|:12434|ollama|docker/.test(hay)) return "Local LLM";
@@ -135,7 +171,7 @@ export function saveTabByokSetup(setup) {
 }
 
 // Remove this tab's applied setup and any loose key.
-function clearTabByokSetup() {
+export function clearTabByokSetup() {
   // Each item separately, so one failure does not keep the others.
   for (const name of [TAB_ROUTER_ITEM, TAB_MODEL_ITEM, TAB_KEY_ITEM, LOOSE_KEY_ITEM]) {
     try { sessionStorage.removeItem(name); } catch {}

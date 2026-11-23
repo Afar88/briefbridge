@@ -37,3 +37,10 @@ body>dialog button{margin-right:8px}
 #agent-app .assistant-settings .ns-settings-body label{color:#d4deea}
 #agent-app .assistant-settings .ns-settings-body button{font-size:13px;padding:9px 14px}
 @media(max-width:600px){.assistant-guide{padding:13px}.assistant-guide ol{padding-left:1.2rem}}
+/* Phone tap targets: every assistant control is at least 44 x 44 px. */
+@media(max-width:680px){
+  #agent-app .ns-inputbar button,#agent-app .ns-settings-body button,#agent-app .ns-devtoggle,#agent-app .ns-w-btn{min-height:44px}
+  #agent-app .ns-inputbar button{padding:8px 14px}
+  #agent-app .ns-settings-body button{padding:10px 14px}
+  #agent-app button.ns-modal-close{min-width:44px;min-height:44px}
+}

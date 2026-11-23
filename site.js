@@ -1,4 +1,4 @@
-import { App } from "./app.js";
+import { App, asksToDeleteBrief, asksToSaveBrief, draftFromRequest, parseBriefText, validateBrief } from "./app.js";
 import { boot } from "./runtime/index.js";
 
 const DIALOGS = {
@@ -100,6 +100,9 @@ function openReview(content, exact) {
   });
 }
 
+// Save/delete actions the assistant asked to run during the current turn.
+const reviewedThisTurn = new Set();
+
 async function reviewActions(engine, items, fallback) {
   const ownOrigin = location.origin;
   if (items.length > 1 && items.some(item => item.origin === ownOrigin && DIALOGS[item.action])) {
@@ -111,11 +114,111 @@ async function reviewActions(engine, items, fallback) {
     if (details.refusal) throw new Error(details.refusal);
     const content = { ...DIALOGS[item.action], details };
     const exact = `${item.action} on ${item.origin} (${item.effect})\n${JSON.stringify(item.arguments, null, 2)}`;
+    reviewedThisTurn.add(item.action);
     const approved = await openReview(content, exact);
     document.querySelector("#ns-input")?.focus();
     return approved;
   }
   return fallback(items);
+}
+
+// Fallback for a reply that contains a complete brief but no tool call: parse
+// it into the form fields. Skipped whenever the form already holds content,
+// so a fill_brief_form tool call or visitor typing always wins.
+function maybeFillBriefFromReply(text) {
+  const draft = App.page.getWorkspaceState().currentDraft;
+  const empty = !draft.title && !draft.objective && !draft.audience && !(draft.deliverables || []).length;
+  if (!empty) return;
+  const brief = parseBriefText(text);
+  if (!brief) return;
+  App.page.fillBriefForm(brief);
+  const notice = document.querySelector("#form-notice");
+  if (notice) {
+    notice.textContent = "The assistant filled the brief form. Review it, then save when ready.";
+    notice.className = "notice success";
+  }
+  document.querySelector("#brief-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function setFormNotice(text, kind = "success") {
+  const notice = document.querySelector("#form-notice");
+  if (!notice) return;
+  notice.textContent = text;
+  notice.className = `notice ${kind}`;
+}
+
+function reviewItem(action, args) {
+  return { action, origin: location.origin, effect: "irreversible", arguments: args };
+}
+
+// A clear save request always reaches the save dialog: when the assistant
+// did not call save_brief itself, the page opens the same review dialog for
+// the brief in the form. Nothing is saved unless the visitor confirms.
+async function ensureSaveReviewed(requests) {
+  let draft = App.page.getWorkspaceState().currentDraft;
+  if (!validateBrief(draft).ok) {
+    const fromRequest = requests.map(draftFromRequest).find(Boolean);
+    if (fromRequest) {
+      App.page.fillBriefForm(fromRequest);
+      draft = App.page.getWorkspaceState().currentDraft;
+    }
+  }
+  const item = reviewItem("save_brief", draft);
+  const details = detailsFor(item);
+  if (details.refusal) {
+    setFormNotice("Brief not saved. Add the missing details first.", "error");
+    return;
+  }
+  const exact = `save_brief on ${item.origin} (page review)\n${JSON.stringify(draft, null, 2)}`;
+  const approved = await openReview({ ...DIALOGS.save_brief, details }, exact);
+  if (!approved) { setFormNotice("Not saved. Keep editing."); return; }
+  const result = App.page.saveBrief(draft);
+  setFormNotice(result.ok ? "Brief saved." : `Not saved. ${result.reason}`, result.ok ? "success" : "error");
+}
+
+// Same guarantee for deletion. Only a brief that the request clearly names
+// (or the only saved brief) is offered, and only the dialog can delete it.
+async function ensureDeleteReviewed(message) {
+  const saved = App.page.getWorkspaceState().savedBriefs;
+  const lower = String(message || "").toLowerCase();
+  const named = saved.filter(item => item.title && lower.includes(item.title.toLowerCase()));
+  const target = named.length === 1 ? named[0] : saved.length === 1 ? saved[0] : null;
+  if (!target) {
+    if (saved.length) setFormNotice("Pick the brief to delete in Saved briefs.", "error");
+    return;
+  }
+  const item = reviewItem("delete_brief", { id: target.id });
+  const details = detailsFor(item);
+  if (details.refusal) return;
+  const exact = `delete_brief on ${item.origin} (page review)\n${JSON.stringify(item.arguments, null, 2)}`;
+  const approved = await openReview({ ...DIALOGS.delete_brief, details }, exact);
+  if (!approved) return;
+  const result = App.page.deleteBrief(target.id);
+  setFormNotice(result.ok ? "Brief deleted." : `Not deleted. ${result.reason}`, result.ok ? "success" : "error");
+}
+
+function watchAssistantReplies(engine) {
+  const original = engine.streamTurn.bind(engine);
+  const requests = [];
+  engine.streamTurn = (userText, ...rest) => {
+    reviewedThisTurn.clear();
+    requests.unshift(String(userText || ""));
+    const stream = original(userText, ...rest);
+    const wrapped = (async function* () {
+      let completed = null;
+      for await (const event of stream) {
+        if (event?.type === "turn.completed") completed = event.result;
+        yield event;
+      }
+      try { maybeFillBriefFromReply(completed?.text); } catch { /* never break a reply */ }
+      try {
+        if (asksToSaveBrief(userText) && !reviewedThisTurn.has("save_brief")) await ensureSaveReviewed(requests);
+        else if (asksToDeleteBrief(userText) && !reviewedThisTurn.has("delete_brief")) await ensureDeleteReviewed(userText);
+      } catch (error) { console.error("BriefBridge review failed", error); }
+    })();
+    wrapped.steer = stream.steer;
+    return wrapped;
+  };
 }
 
 async function startAssistant() {
@@ -128,6 +231,7 @@ async function startAssistant() {
     });
     const fallbackReview = engine.onActionConfirm;
     engine.onActionConfirm = items => reviewActions(engine, items, fallbackReview);
+    watchAssistantReplies(engine);
     const needsKey = !engine.mockLLM && (!engine.byokKey || engine.byokKey === "demo");
     status.textContent = needsKey
       ? "Runtime ready. Add your Otari API key in AI model settings to start chatting."
