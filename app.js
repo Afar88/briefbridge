@@ -36,6 +36,20 @@ export function mapProjectTypeOption(value) {
   return best;
 }
 
+// Clear visitor requests to save or delete a brief. Negated requests such as
+// "don't save" never count, so the page only opens a dialog when asked.
+const NEGATED = /\b(don'?t|do not|never|not yet|no need to|stop)\b[^.!?]{0,20}\b(save|store|delete|remove)/i;
+export function asksToSaveBrief(message) {
+  const value = String(message || "");
+  if (NEGATED.test(value)) return false;
+  return /\b(save|store)\b/i.test(value) && !/\b(delete|remove)\b/i.test(value);
+}
+export function asksToDeleteBrief(message) {
+  const value = String(message || "");
+  if (NEGATED.test(value)) return false;
+  return /\b(delete|remove)\b/i.test(value) && /\b(brief|it|that|this|saved|library)\b/i.test(value);
+}
+
 // Section headings a chat reply may use for a project brief.
 const BRIEF_TEXT_SECTIONS = [
   ["objective", ["objective", "project objective", "goal"]],

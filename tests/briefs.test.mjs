@@ -196,3 +196,14 @@ test("ignores ordinary chat replies without a complete brief", async () => {
   assert.equal(parseBriefText("Sure! What is your budget?"), null);
   assert.equal(parseBriefText("## Objective\nOnly one section, nothing else."), null);
 });
+
+test("detects clear save and delete requests, never negated ones", async () => {
+  const { asksToSaveBrief, asksToDeleteBrief } = await import("../app.js");
+  assert.equal(asksToSaveBrief("Please fill in the brief form and save the brief to my library."), true);
+  assert.equal(asksToSaveBrief("Yes, save it."), true);
+  assert.equal(asksToSaveBrief("Don't save this brief yet."), false);
+  assert.equal(asksToSaveBrief("I need a logo for my bakery."), false);
+  assert.equal(asksToDeleteBrief("Now please delete that saved brief from my library."), true);
+  assert.equal(asksToDeleteBrief("Do not delete my brief."), false);
+  assert.equal(asksToDeleteBrief("Please save the brief."), false);
+});
