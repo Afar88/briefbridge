@@ -54,7 +54,8 @@ test("page handoff fills text fields without saving and removes the fragment", a
   assert.match(source, /history\.replaceState/);
   assert.match(source, /field\.value = value/);
   assert.match(source, /Brief from ShopStart\. Check it, then save\./);
-  assert.match(source, /form\.dispatchEvent\(new Event\("input",\s*\{ bubbles: true \}\)\)/);\n  assert.doesNotMatch(source, /App\.page\.fillBriefForm|localStorage|innerHTML|createElement\("pre"\)/);
+  assert.match(source, /form\.dispatchEvent\(new Event\("input",\s*\{ bubbles: true \}\)\)/);
+  assert.doesNotMatch(source, /App\.page\.fillBriefForm|localStorage|innerHTML|createElement\("pre"\)/);
   const index = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.match(index, /brief-handoff-ui\.js/);
 });
