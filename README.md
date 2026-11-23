@@ -92,6 +92,7 @@ Netlify and Vercel configuration files are retained as secondary hosting fallbac
 - `index.html`, `styles.css`, `app.js`: responsive product UI and browser-local brief library.
 - `agent-manifest.json`, `briefbridge_network.hocon`, `briefbridge_network.network.json`: published agent network and discovery metadata.
 - `site-actions.js`: registers the page's read/save/delete operations with the runtime.
+- `read-aloud.js`: Read aloud for the brief and assistant replies. Uses the browser voice by default; the opt-in Otari voice falls back to it.
 - `site.js`: boots the browser runtime and presents human confirmation before save/delete actions.
 - `runtime/`: unmodified browser runtime files from [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web), under the included Apache-2.0 runtime license.
 - `scripts/check-network.mjs`: validates the published network and required files.
