@@ -65,6 +65,6 @@ export function formValuesFromBriefSections(sections) {
     title: sections.Project, objective: sections.Goal, audience: sections.Audience,
     scope: sections.Scope, deliverables: sections.Deliverables, timeline: sections.Timeline,
     budget: sections.Budget, assumptions: sections.Assumptions, openQuestions: sections["Open questions"],
-    client: "", projectType: "", constraints: "", nextSteps: "",
+    client: "", projectType: "Web design", constraints: "", nextSteps: "",
   };
 }
