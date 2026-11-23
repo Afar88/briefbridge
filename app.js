@@ -338,19 +338,19 @@ export class App {
       if (!checked.ok) return { ok: false, reason: checked.reason };
       const items = readSaved();
       if (items.length >= 50) {
-        return { ok: false, reason: "Your saved library is full (50 briefs). Export a copy or delete an older brief before saving another." };
+        return { ok: false, reason: "Library full. Export or delete one brief first." };
       }
       const record = { id: makeId(), createdAt: new Date().toISOString(), brief: checked.brief };
       items.unshift(record);
       if (!writeSaved(items)) {
-        return { ok: false, reason: "This browser could not save the brief. Check available storage and try again." };
+        return { ok: false, reason: "Storage failed. Check space and try again." };
       }
       window.dispatchEvent(new CustomEvent("briefbridge:saved", { detail: record }));
       return { ok: true, id: record.id, title: record.brief.title, createdAt: record.createdAt };
     },
     checkDeleteBrief(id) {
       const item = readSaved().find(entry => entry.id === id);
-      return item ? { ok: true, title: item.brief.title } : { ok: false, reason: "That saved brief no longer exists. Refresh the workspace and try again." };
+      return item ? { ok: true, title: item.brief.title } : { ok: false, reason: "That brief no longer exists." };
     },
     // Fill the on-page brief form from assistant-provided details. Only fills;
     // saving still goes through save_brief or the Save button.
@@ -372,7 +372,7 @@ export class App {
       const check = this.checkDeleteBrief(id);
       if (!check.ok) return { ok: false, reason: check.reason };
       if (!writeSaved(readSaved().filter(item => item.id !== id))) {
-        return { ok: false, reason: "This browser could not update its saved library. Try again." };
+        return { ok: false, reason: "Storage failed. Try again." };
       }
       window.dispatchEvent(new CustomEvent("briefbridge:deleted", { detail: { id } }));
       return { ok: true, deleted: id, title: check.title };
@@ -439,6 +439,25 @@ function renderPreview(brief) {
   document.querySelector("#export-json").disabled = !valid.ok;
 }
 
+function showFormNotice(text, kind = "success") {
+  const notice = document.querySelector("#form-notice");
+  if (!notice) return;
+  clearTimeout(notice._fadeTimer);
+  notice.className = `notice ${kind}`;
+  notice.replaceChildren(document.createTextNode(text));
+  if (kind === "error") {
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "notice-close";
+    close.setAttribute("aria-label", "Dismiss message");
+    close.textContent = "×";
+    close.addEventListener("click", () => notice.replaceChildren(), { once: true });
+    notice.append(close);
+  } else {
+    notice._fadeTimer = setTimeout(() => notice.replaceChildren(), 4000);
+  }
+}
+
 function renderSaved() {
   const list = document.querySelector("#saved-briefs");
   if (!list) return;
@@ -448,7 +467,7 @@ function renderSaved() {
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "empty-state";
-    empty.textContent = "Your saved briefs will appear here.";
+    empty.textContent = "No saved briefs yet.";
     list.append(empty);
     return;
   }
@@ -504,9 +523,7 @@ function init() {
   form.addEventListener("submit", event => {
     event.preventDefault();
     const result = App.page.saveBrief(readFormBrief());
-    const notice = document.querySelector("#form-notice");
-    notice.textContent = result.ok ? "Brief saved to this browser." : result.reason;
-    notice.className = result.ok ? "notice success" : "notice";
+    showFormNotice(result.ok ? "Brief saved." : result.reason, result.ok ? "success" : "error");
     renderSaved();
   });
 
@@ -523,23 +540,20 @@ function init() {
   importInput.addEventListener("change", async () => {
     const file = importInput.files?.[0];
     if (!file) return;
-    const notice = document.querySelector("#form-notice");
     try {
       if (file.size > 1_000_000) {
-        throw new Error("That file is too large. Choose a JSON brief under 1 MB.");
+        throw new Error("File too large. Use a JSON brief under 1 MB.");
       }
       const result = parseBriefJson(await file.text());
       if (!result.ok) throw new Error(result.reason);
       setFormValues(result.brief);
       const persisted = persistDraft(result.brief);
       renderPreview(result.brief);
-      notice.textContent = persisted
-        ? "Brief imported into the editor. Review it, then save when ready."
-        : "Brief imported into the editor, but this browser could not autosave the draft.";
-      notice.className = persisted ? "notice success" : "notice";
+      showFormNotice(persisted
+        ? "Brief imported. Review, then save."
+        : "Brief imported. The draft could not autosave.", persisted ? "success" : "error");
     } catch (error) {
-      notice.textContent = error.message || "The selected file could not be imported.";
-      notice.className = "notice";
+      showFormNotice(error.message || "That file could not be imported.", "error");
     } finally {
       importInput.value = "";
     }
@@ -549,9 +563,7 @@ function init() {
     let cleared = true;
     try { localStorage.removeItem(DRAFT_KEY); } catch { cleared = false; }
     renderPreview(readFormBrief());
-    const notice = document.querySelector("#form-notice");
-    notice.textContent = cleared ? "Draft cleared." : "The form was cleared, but browser storage could not be updated.";
-    notice.className = cleared ? "notice success" : "notice";
+    showFormNotice(cleared ? "Draft cleared." : "Cleared, but storage could not update.", cleared ? "success" : "error");
   });
   document.querySelector("#saved-briefs").addEventListener("click", event => {
     const open = event.target.closest("[data-open-brief]");
@@ -571,9 +583,7 @@ function init() {
             b.openQuestions?.length || b.nextSteps?.length
           );
         }
-        const notice = document.querySelector("#form-notice");
-        notice.textContent = `Loaded “${item.brief.title}” into the editor. Review it before making changes.`;
-        notice.className = "notice success";
+        showFormNotice(`Loaded “${item.brief.title}” for review.`);
         document.querySelector("#brief-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
         document.querySelector('#brief-form [name="title"]')?.focus({ preventScroll: true });
       }
@@ -583,9 +593,7 @@ function init() {
       if (item && window.confirm(`Delete “${item.brief.title}” from this browser?`)) {
         const result = App.page.deleteBrief(item.id);
         renderSaved();
-        const notice = document.querySelector("#form-notice");
-        notice.textContent = result.ok ? `Deleted “${result.title}”.` : result.reason;
-        notice.className = result.ok ? "notice success" : "notice";
+        showFormNotice(result.ok ? `Deleted “${result.title}”.` : result.reason, result.ok ? "success" : "error");
       }
     }
   });

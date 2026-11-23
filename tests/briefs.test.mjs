@@ -99,7 +99,7 @@ test("refuses to silently discard saved briefs when the library is full", () => 
       deliverables: ["A deliverable"],
     });
     assert.equal(result.ok, false);
-    assert.match(result.reason, /library is full/);
+    assert.match(result.reason, /library full/i);
     assert.equal(JSON.parse(store.get("briefbridge.saved.v1")).length, 50);
     assert.equal(JSON.parse(store.get("briefbridge.saved.v1"))[0].id, "saved-0");
   } finally {

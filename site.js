@@ -135,8 +135,7 @@ function maybeFillBriefFromReply(text) {
   App.page.fillBriefForm(brief);
   const notice = document.querySelector("#form-notice");
   if (notice) {
-    notice.textContent = "The assistant filled the brief form. Review it, then save when ready.";
-    notice.className = "notice success";
+    setFormNotice("The assistant filled the form. Review, then save.");
   }
   document.querySelector("#brief-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -144,8 +143,20 @@ function maybeFillBriefFromReply(text) {
 function setFormNotice(text, kind = "success") {
   const notice = document.querySelector("#form-notice");
   if (!notice) return;
-  notice.textContent = text;
+  clearTimeout(notice._fadeTimer);
   notice.className = `notice ${kind}`;
+  notice.replaceChildren(document.createTextNode(text));
+  if (kind === "error") {
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "notice-close";
+    close.setAttribute("aria-label", "Dismiss message");
+    close.textContent = "×";
+    close.addEventListener("click", () => notice.replaceChildren(), { once: true });
+    notice.append(close);
+  } else {
+    notice._fadeTimer = setTimeout(() => notice.replaceChildren(), 4000);
+  }
 }
 
 function reviewItem(action, args) {
