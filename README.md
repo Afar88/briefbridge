@@ -76,7 +76,7 @@ The Render static site is provisioned at **https://briefbridge-bpxd.onrender.com
 
 1. Connect the GitHub repository `Afar88/briefbridge` to Render.
 2. Create a new **Blueprint** and select this repository.
-3. Select the branch `build/complete-mozilla-otari`.
+3. Select `main` as the only deployment branch for this repository. Do not deploy from feature branches.
 4. Render reads `render.yaml`, runs `npm install && npm run check`, and publishes the repository root.
 5. Keep the generated `onrender.com` URL publicly accessible to judges and testers.
 6. Verify that `/agent-manifest.json` and `/briefbridge_network.network.json` return successfully with `Access-Control-Allow-Origin: *`.
