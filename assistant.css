@@ -65,3 +65,22 @@ body>dialog h2{margin:0 0 var(--s3);font:800 20px Manrope,"DM Sans",sans-serif}
 #agent-app .ns-anode{background:#22344e;color:#f3f6fa;border:1px solid var(--ns-border);border-radius:10px;max-width:100%;overflow-wrap:anywhere}
 #agent-app .ns-key-help{background:#14213a}
 #agent-app summary{display:flex;align-items:center;min-height:44px;cursor:pointer}
+
+/* Readable AI key setup and provider choices. */
+#agent-app .ns-key-providers { gap: var(--s2); }
+#agent-app .ns-key-providers a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--s2) var(--s3);
+}
+#agent-app .ns-key-providers small,
+#agent-app .ns-hint,
+#agent-app .ns-arole { font-size: 13px; }
+#agent-app .ns-hint.warn {
+  color: #ffb4a8;
+  font-size: 14px;
+  font-weight: 700;
+}
