@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="ShopStart helps small businesses plan a first website with BriefBridge.">
+  <title>ShopStart — Start your website</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./site.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="#top" aria-label="ShopStart home">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>ShopStart</span>
+      </a>
+      <span class="topbar-note">A simple start for your website</span>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">Your business, online</p>
+      <h1 id="hero-title">Start your website with a clear plan.</h1>
+      <p class="lede">ShopStart helps small businesses plan a first website.</p>
+      <a class="button button-primary" href="#assistant">Start a website brief</a>
+    </section>
+
+    <section class="assistant-section" id="assistant" aria-labelledby="assistant-title">
+      <div class="section-heading">
+        <p class="eyebrow">Tell us what you need</p>
+        <h2 id="assistant-title">What should your website do?</h2>
+        <p class="section-lede">Tell us what you sell and where you work.</p>
+      </div>
+
+      <p class="status-line" id="assistant-status" role="status">Loading ShopStart…</p>
+      <div class="assistant-card">
+        <div id="agent-app" aria-label="ShopStart assistant"></div>
+      </div>
+      <p class="privacy-note">Your key goes to your chosen AI provider only.</p>
+      <p class="peer-note">BriefBridge gets your request after you approve.</p>
+    </section>
+
+    <section class="partner-result" id="partner-result" hidden aria-labelledby="partner-result-title">
+      <div class="result-topline">
+        <p class="eyebrow">Partner result</p>
+        <span class="source-label">Made by BriefBridge</span>
+      </div>
+      <h2 id="partner-result-title">Your BriefBridge reply</h2>
+      <p class="result-note" id="partner-result-note"></p>
+      <pre class="result-text" id="partner-result-text"></pre>
+      <a class="button button-primary open-briefbridge"
+         href="https://briefbridge-bpxd.onrender.com"
+         target="_blank" rel="noopener noreferrer">Open in BriefBridge</a>
+    </section>
+
+    <section class="next-step" aria-label="Next step">
+      <p class="eyebrow">Keep going</p>
+      <h2>Ready to shape the full brief?</h2>
+      <p>Open BriefBridge to review and save your brief.</p>
+      <a class="button button-outline"
+         href="https://briefbridge-bpxd.onrender.com"
+         target="_blank" rel="noopener noreferrer">Open in BriefBridge</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span class="brand brand-small"><span class="brand-mark" aria-hidden="true">S</span>ShopStart</span>
+      <p>Built to connect with BriefBridge.</p>
+    </div>
+  </footer>
+</body>
+</html>

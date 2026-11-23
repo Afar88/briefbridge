@@ -1,0 +1,8 @@
+{
+  "name": "shopstart-partner-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check ./site.js && node ./scripts/check-json.mjs"
+  }
+}
