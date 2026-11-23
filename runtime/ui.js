@@ -1,5 +1,6 @@
 // ui.js — the themeable chat + execution-trace inspector.
 // Changed by agentic-web. See README.md in this folder for what changed.
+// BriefBridge change (23 Nov 2026): chat box is a growing <textarea>; Enter sends, Shift+Enter adds a line.
 //
 // Renders three surfaces from the trace bus: a chat pane, a live network/origin
 // graph, and a chronological execution log. Businesses restyle via CSS variables
