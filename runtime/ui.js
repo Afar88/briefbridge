@@ -7,7 +7,7 @@
 // imposes layout, not brand.
 
 import { ChatMessageType } from "./kernel.js";
-import { selectAutomaticChatModel } from "./model-selection.js";
+import { chatModelIds, checkChatModel, friendlyModelError, selectAutomaticChatModel } from "./model-selection.js";
 import {
   canUseByokCookie,
   deleteByokProfileAndTabSetup,
@@ -563,7 +563,7 @@ export function mountApp(root, { engine, trace, manifest }) {
         bubble.textContent = receipts.map(r => `${r.action}: ${r.result?.businessOutcome === "unverified" ? "response received; business outcome unverified" : r.status}\n${JSON.stringify(r.result ?? r.error ?? "", null, 2)}`).join("\n\n");
         // Receipts are already in history; the next chat turn can interpret them.
         return true;
-      } catch (error) { addBubble(msgs, "bot", error.message); return false; }
+      } catch (error) { addBubble(msgs, "bot", friendlyModelError(error.message)); return false; }
       finally { actionSubmissionBusy = false; newChatBtn.disabled = false; input.disabled = false; sendBtn.disabled = false; }
     }
     text = (text || "").trim();
@@ -583,7 +583,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       }
       if (!result) throw new Error("The agent turn ended without a result.");
       turnStatusController.finalAnswerStarted();
-      const clean = visibleText(result.text);
+      const clean = friendlyModelError(visibleText(result.text));
       // Always show the cleaned text — never the raw answer or retained streamed text
       // (which could be an AAOSA envelope / cruse-ui JSON). Empty is fine: widgets carry the turn.
       if (!currentBot) currentBot = addBubble(msgs, "bot", clean);
@@ -593,7 +593,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
     } catch (err) {
       turnStatusController.clear();
-      addBubble(msgs, "bot", "⚠️ " + err.message);
+      addBubble(msgs, "bot", "⚠️ " + friendlyModelError(err.message));
     } finally {
       turnStatusController.clear();
       if (activeTurnStream === stream) activeTurnStream = null;
@@ -1087,6 +1087,9 @@ export function mountApp(root, { engine, trace, manifest }) {
     if (message) setProfileHint(message);
     refreshHint();
   };
+  // Last live catalog read from the router, used to check chosen models.
+  let lastCatalog = null;
+  const preferredModels = () => (formProvider?.name === "Otari" ? ["inclusionai/ling-3.0-flash-vl"] : []);
   const fetchAvailableModels = async (router, key) => {
     if (!router || isMockRouter(router)) return null;
     try {
@@ -1096,10 +1099,12 @@ export function mountApp(root, { engine, trace, manifest }) {
       });
       if (!response.ok) return null;
       const body = await response.json();
-      const catalog = Array.isArray(body?.data) ? body.data : [];
-      const models = catalog
-        .map((item) => normalizeModelName(item?.id))
-        .filter(Boolean);
+      const catalog = (Array.isArray(body?.data) ? body.data : [])
+        .map((item) => ({ ...item, id: normalizeModelName(item?.id) }))
+        .filter((item) => item.id);
+      lastCatalog = catalog;
+      // Only chat models that pass every suitability check are offered.
+      const models = chatModelIds(catalog);
       modelSelectEl.innerHTML = "";
       const placeholder = document.createElement("option");
       placeholder.value = "";
@@ -1114,18 +1119,15 @@ export function mountApp(root, { engine, trace, manifest }) {
       const current = normalizeModelName(modelEl.value);
       // Only a live, suitable chat model may be preferred; nothing is hard-coded
       // as the default because providers retire published model IDs.
-      const preferred = formProvider?.name === "Otari"
-        ? ["inclusionai/ling-3.0-flash-vl"]
-        : [];
-      const selectedModel = selectAutomaticChatModel(catalog, [current, ...preferred].filter(Boolean));
+      const selectedModel = selectAutomaticChatModel(catalog, [current, ...preferredModels()].filter(Boolean));
       const selected = selectedModel?.id || "";
       modelSelectEl.value = selected;
       if (selected) modelEl.value = selected;
-      setProfileHint(models.length
+      setProfileHint(catalog.length
         ? (selected
-          ? `Checked ${models.length} published models and selected ${selected}. It is listed as a priced chat model with tool support.`
-          : `Loaded ${models.length} models, but none is explicitly marked as a priced chat model with tool support. Nothing was selected; check your provider's model settings.`)
-        : "Your provider returned an empty model list. Automatic selection is unavailable.");
+          ? `Found ${models.length} chat models. Selected ${selected}.`
+          : "No chat model with tool support found.")
+        : "Your provider returned an empty model list.");
       return models;
     } catch {
       // Not every OpenAI-compatible provider publishes a model catalog.
@@ -1198,17 +1200,36 @@ export function mountApp(root, { engine, trace, manifest }) {
       refreshHint();
     }
     const availableModels = await fetchAvailableModels(router, key);
-    if (!availableModels?.length || availableModels.includes(model)) return true;
-
-    const shown = availableModels.slice(0, 6);
-    const remainder = availableModels.length - shown.length;
-    setProfileHint(
-      `Model "${model}" is not published by this upstream. Available: ${shown.join(", ")}${remainder > 0 ? `, and ${remainder} more` : ""}.`,
-      "warn",
-    );
+    if (!availableModels) return true;
+    // On a send the engine uses the applied model, which may differ from the form.
+    const usedModel = requireActiveKey ? normalizeModelName(engine.modelOverride || model) : model;
+    return !rejectNonChatModel(usedModel, requireActiveKey);
+  };
+  // Replace a model that is not a suitable chat model with the automatic pick
+  // and say so in a short note. True when the model was rejected.
+  const rejectNonChatModel = (model, inChat = false) => {
+    const check = checkChatModel(model, lastCatalog, preferredModels());
+    if (check.ok) return false;
+    modelEl.value = check.model;
+    modelSelectEl.value = check.model;
+    setProfileHint(check.note, "warn");
     root.querySelector(".ns-settings").open = true;
-    focusModelField();
-    return false;
+    root.querySelector(".ns-settings-advanced").open = true;
+    if (inChat) addBubble(msgs, "bot", `⚠️ ${check.note}`);
+    refreshHint();
+    return true;
+  };
+  // A loaded saved setup gets the same check before it can be used.
+  const checkLoadedSetupModel = async (loadedHint) => {
+    const key = keyEl.value.trim();
+    const model = normalizeModelName(modelEl.value);
+    const router = routerEl.value.trim() || byokRouter;
+    if (!key || key === "demo" || !model || !router || isMockRouter(router)) return;
+    const models = await fetchAvailableModels(router, key);
+    modelEl.value = model;
+    if (models && rejectNonChatModel(model)) return;
+    modelSelectEl.value = models?.includes(model) ? model : "";
+    if (loadedHint) setProfileHint(loadedHint);
   };
   // Put back the site's own settings in place of those a provider's key filled in,
   // leaving any field the visitor has changed.
@@ -1295,7 +1316,9 @@ export function mountApp(root, { engine, trace, manifest }) {
     selectedProfile = getSelectedByokProfile(profileStore);
     if (selectedProfile) {
       applyProfileToForm(selectedProfile);
-      setProfileHint(`Loaded setup "${selectedProfile.name}". Select Save and start to use it for this page.`);
+      const loadedHint = `Loaded setup "${selectedProfile.name}". Select Save and start to use it for this page.`;
+      setProfileHint(loadedHint);
+      checkLoadedSetupModel(loadedHint);
     } else {
       profileNameEl.value = "";
       setProfileHint();
@@ -1333,6 +1356,8 @@ export function mountApp(root, { engine, trace, manifest }) {
   });
   refreshHint();
   if (needsByok) setProfileHint(setupMessage, "warn");
+  // A setup applied before this check existed may hold a non-chat model.
+  if (engine.byokKey && engine.byokKey !== "demo" && engine.modelOverride) checkLoadedSetupModel("");
 
   root.querySelector("#ns-apply").addEventListener("click", async () => {
     const p = new URLSearchParams(location.search);
