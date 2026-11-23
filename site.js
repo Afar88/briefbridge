@@ -319,4 +319,17 @@ function watchReplies() {
 window.addEventListener("briefbridge:assistant-ready", watchReplies, { once: true });
 window.addEventListener("pagehide", () => reader.stop());
 
+// Success notes fade after 4 seconds (CSS). Restart the fade whenever the
+// note changes, so a second message in a row is still shown. Errors stay.
+function restartNoticeFade() {
+  const notice = document.querySelector("#form-notice");
+  if (!notice) return;
+  new MutationObserver(() => {
+    notice.style.animation = "none";
+    void notice.offsetWidth;
+    notice.style.animation = "";
+  }).observe(notice, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+}
+restartNoticeFade();
+
 startAssistant();
