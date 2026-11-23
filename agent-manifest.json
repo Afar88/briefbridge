@@ -74,6 +74,7 @@
     "bridge": "./bridge/action-bridge.html",
     "agentTools": [
       "get_workspace_state",
+      "fill_brief_form",
       "save_brief",
       "delete_brief"
     ]

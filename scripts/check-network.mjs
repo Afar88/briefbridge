@@ -128,10 +128,15 @@ if (!hasHeader("/runtime/sandbox-worker.js", "Content-Security-Policy", "default
   fail("Vercel must apply the restrictive sandbox-worker CSP.");
 }
 if (manifest.llm_router?.base_url !== "https://api.otari.ai/api/v1") fail("The published default router should be hosted Mozilla Otari.");
-if (networkJson.llm_config?.model_name !== "alibaba/qwen3.5-397b-a17b") fail("The default model must match the model confirmed in the Otari available-model list.");
+// Providers retire published model IDs, so the network and settings must not
+// hard-code one. Save and start picks a live published chat model instead.
+if (networkJson.llm_config?.model_name) fail("The network must not hard-code a model; the visitor's provider setup chooses it.");
 const runtimeUi = await readFile(resolve(root, "runtime/ui.js"), "utf8");
-if (!runtimeUi.includes('model: "' + networkJson.llm_config.model_name + '"')) fail("The Otari settings preset must match the network's default managed model.");
+if (runtimeUi.includes("alibaba/qwen3.5-397b-a17b")) fail("The Otari settings preset must not use a retired default model.");
 if (runtimeUi.includes("alibaba/qwen3.8-flash")) fail("The Otari preset must not use an unrelated provider's default model.");
+if (!runtimeUi.includes("selectAutomaticChatModel")) fail("Save and start must pick a published chat model from the live router list.");
+const modelSelection = await readFile(resolve(root, "runtime/model-selection.js"), "utf8");
+if (!modelSelection.includes("NON_COMPLETION_MODEL_ID")) fail("Model selection must keep rejecting TTS and other non-chat models.");
 if (manifest.llm_router?.mock !== false) fail("The public network must not run in mock mode.");
 if (manifest.deployment?.mode !== "static") fail("The deployment mode must be static.");
 if (!manifest.actions?.module || !manifest.actions?.bridge) fail("The action module and bridge must be declared.");

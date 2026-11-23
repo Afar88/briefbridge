@@ -15,6 +15,32 @@ class BriefBridgeActions {
     });
 
     actions.register({
+      name: "fill_brief_form",
+      description: "Fill the on-page project brief form with details from the conversation so the visitor can review them. This is the expected way to prepare a brief. It only fills the form; it does not save the brief.",
+      effect: "write",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          title: { type: "string", maxLength: 120, description: "A concise project title." },
+          client: { type: "string", maxLength: 120, description: "Client or organisation, if supplied." },
+          projectType: { type: "string", maxLength: 60, description: "Project category. Use one of the form's options: Marketing, Branding, Web design, Software / product, Content creation, Event, Research, Other." },
+          objective: { type: "string", maxLength: 1600, description: "The outcome the project should achieve." },
+          audience: { type: "string", maxLength: 800, description: "The intended audience or users." },
+          scope: { type: "string", maxLength: 1600, description: "Included work, context and boundaries." },
+          deliverables: { type: "array", maxItems: 12, items: { type: "string", maxLength: 220 }, description: "Specific outputs the client should receive." },
+          constraints: { type: "array", maxItems: 12, items: { type: "string", maxLength: 220 }, description: "Requirements, dependencies or things to avoid." },
+          timeline: { type: "string", maxLength: 240, description: "Timeline supplied or agreed by the user. Do not invent dates." },
+          budget: { type: "string", maxLength: 160, description: "Budget supplied or agreed by the user. Do not invent prices." },
+          assumptions: { type: "array", maxItems: 12, items: { type: "string", maxLength: 220 }, description: "Unconfirmed assumptions, clearly labelled." },
+          openQuestions: { type: "array", maxItems: 12, items: { type: "string", maxLength: 220 }, description: "Questions that still need answers." },
+          nextSteps: { type: "array", maxItems: 12, items: { type: "string", maxLength: 220 }, description: "Practical next steps." },
+        },
+      },
+      execute: args => App.page.fillBriefForm(args),
+    });
+
+    actions.register({
       name: "save_brief",
       description: "Save a complete project brief in the visitor's local BriefBridge library. This action requires the visitor's confirmation first. Returns the saved brief ID and title, or a refusal reason.",
       effect: "irreversible",

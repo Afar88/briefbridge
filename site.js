@@ -1,4 +1,4 @@
-import { App } from "./app.js";
+import { App, parseBriefText } from "./app.js";
 import { boot } from "./runtime/index.js";
 
 const DIALOGS = {
@@ -118,6 +118,39 @@ async function reviewActions(engine, items, fallback) {
   return fallback(items);
 }
 
+// Fallback for a reply that contains a complete brief but no tool call: parse
+// it into the form fields. Skipped whenever the form already holds content,
+// so a fill_brief_form tool call or visitor typing always wins.
+function maybeFillBriefFromReply(text) {
+  const draft = App.page.getWorkspaceState().currentDraft;
+  const empty = !draft.title && !draft.objective && !draft.audience && !(draft.deliverables || []).length;
+  if (!empty) return;
+  const brief = parseBriefText(text);
+  if (!brief) return;
+  App.page.fillBriefForm(brief);
+  const notice = document.querySelector("#form-notice");
+  if (notice) {
+    notice.textContent = "The assistant filled the brief form. Review it, then save when ready.";
+    notice.className = "notice success";
+  }
+  document.querySelector("#brief-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function watchAssistantReplies(engine) {
+  const original = engine.streamTurn.bind(engine);
+  engine.streamTurn = (...args) => {
+    const stream = original(...args);
+    return (async function* () {
+      let completed = null;
+      for await (const event of stream) {
+        if (event?.type === "turn.completed") completed = event.result;
+        yield event;
+      }
+      try { maybeFillBriefFromReply(completed?.text); } catch { /* never break a reply */ }
+    })();
+  };
+}
+
 async function startAssistant() {
   const status = document.querySelector("#assistant-status");
   const siteBase = new URL("./", import.meta.url).href;
@@ -128,6 +161,7 @@ async function startAssistant() {
     });
     const fallbackReview = engine.onActionConfirm;
     engine.onActionConfirm = items => reviewActions(engine, items, fallbackReview);
+    watchAssistantReplies(engine);
     const needsKey = !engine.mockLLM && (!engine.byokKey || engine.byokKey === "demo");
     status.textContent = needsKey
       ? "Runtime ready. Add your Otari API key in AI model settings to start chatting."

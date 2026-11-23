@@ -154,3 +154,45 @@ test("handles non-object validation input without crashing", () => {
 test("uses a safe project type when none is supplied", () => {
   assert.equal(normalizeBrief({ title: "Test" }).projectType, "Other");
 });
+
+test("maps free-text project types to the closest dropdown option", async () => {
+  const { mapProjectTypeOption } = await import("../app.js");
+  assert.equal(mapProjectTypeOption("Branding + Web Design"), "Web design");
+  assert.equal(mapProjectTypeOption("branding"), "Branding");
+  assert.equal(mapProjectTypeOption("mobile app"), "Software / product");
+  assert.equal(mapProjectTypeOption(""), "");
+});
+
+test("parses a complete brief written in chat text", async () => {
+  const { parseBriefText } = await import("../app.js");
+  const reply = [
+    "# Bakery website",
+    "**Project type:** Web design",
+    "",
+    "## Objective",
+    "Launch a one-page website for a small bakery in Lagos.",
+    "",
+    "## Target audience",
+    "Local customers and event planners.",
+    "",
+    "## Deliverables",
+    "- Logo",
+    "- One-page website",
+    "",
+    "## Budget",
+    "About $300",
+  ].join("\n");
+  const brief = parseBriefText(reply);
+  assert.ok(brief);
+  assert.equal(brief.title, "Bakery website");
+  assert.equal(brief.projectType, "Web design");
+  assert.match(brief.objective, /one-page website/);
+  assert.deepEqual(brief.deliverables, ["Logo", "One-page website"]);
+  assert.equal(brief.budget, "About $300");
+});
+
+test("ignores ordinary chat replies without a complete brief", async () => {
+  const { parseBriefText } = await import("../app.js");
+  assert.equal(parseBriefText("Sure! What is your budget?"), null);
+  assert.equal(parseBriefText("## Objective\nOnly one section, nothing else."), null);
+});

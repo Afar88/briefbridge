@@ -10,7 +10,7 @@ import { ChatMessageType } from "./kernel.js";
 import { selectAutomaticChatModel } from "./model-selection.js";
 import {
   canUseByokCookie,
-  deleteByokProfile,
+  deleteByokProfileAndTabSetup,
   getSelectedByokProfile,
   guessByokProfileName,
   loadByokStore,
@@ -37,7 +37,9 @@ export const API_KEY_PROVIDERS = [
     name: "Otari",
     keyUrl: "https://otari.ai/dashboard#/keys",
     router: "https://api.otari.ai/api/v1",
-    model: "alibaba/qwen3.5-397b-a17b",
+    // No fixed model: Otari retires published models, so Save and start reads
+    // the live model list and picks a published chat model instead.
+    model: "",
     keyPrefixes: ["otk_"],
     accessNote: "Billing may be required",
   },
@@ -1110,8 +1112,10 @@ export function mountApp(root, { engine, trace, manifest }) {
         modelSelectEl.appendChild(option);
       }
       const current = normalizeModelName(modelEl.value);
+      // Only a live, suitable chat model may be preferred; nothing is hard-coded
+      // as the default because providers retire published model IDs.
       const preferred = formProvider?.name === "Otari"
-        ? ["alibaba/qwen3.5-397b-a17b", "inclusionai/ling-3.0-flash-vl"]
+        ? ["inclusionai/ling-3.0-flash-vl"]
         : [];
       const selectedModel = selectAutomaticChatModel(catalog, [current, ...preferred].filter(Boolean));
       const selected = selectedModel?.id || "";
@@ -1305,11 +1309,27 @@ export function mountApp(root, { engine, trace, manifest }) {
   deleteProfileBtn.addEventListener("click", () => {
     const id = profileEl.value;
     if (!id) return;
-    const oldName = profileStore.profiles.find((p) => p.id === id)?.name || "setup";
-    profileStore = deleteByokProfile(id);
+    // Deletes the saved profile and, when this tab uses that setup, its
+    // sessionStorage copy of the key. Nothing else is touched.
+    const { store, profile, clearedTab } = deleteByokProfileAndTabSetup(id);
+    profileStore = store;
     selectedProfile = getSelectedByokProfile(profileStore);
     refreshProfileOptions(profileStore.selectedId);
-    setProfileHint(`Deleted setup "${oldName}".`);
+    // The key field must never keep a deleted setup's key.
+    keyEl.value = "";
+    profileNameEl.value = "";
+    refreshKeyHelp();
+    refreshHint();
+    const oldName = profile?.name || "setup";
+    const activeInMemory = !!(profile?.key && engine.byokKey && engine.byokKey !== "demo" && profile.key === engine.byokKey);
+    // The running engine holds the key in memory; only a reload drops it.
+    // Say deleted only after every stored copy is gone.
+    if (clearedTab || activeInMemory) {
+      setProfileHint(`Deleted setup "${oldName}". Reloading...`);
+      setTimeout(() => location.reload(), 1200);
+    } else {
+      setProfileHint(`Deleted setup "${oldName}".`);
+    }
   });
   refreshHint();
   if (needsByok) setProfileHint(setupMessage, "warn");
@@ -1325,6 +1345,12 @@ export function mountApp(root, { engine, trace, manifest }) {
       root.querySelector(".ns-settings").open = true;
       keyEl.focus();
       return;
+    }
+    // Read the live model list and pick a published chat model when the form
+    // has none, so Save and start never sends a retired default model.
+    if (isPlaceholderModel(modelEl.value)) {
+      const lookupRouter = routerEl.value.trim() || byokRouter;
+      if (lookupRouter && !isMockRouter(lookupRouter)) await fetchAvailableModels(lookupRouter, key);
     }
     if (!await validateConfiguredModel(false)) return;
     const saved = saveCurrentProfile();

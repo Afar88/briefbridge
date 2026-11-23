@@ -32,7 +32,7 @@ The brief builder works without an AI key. To use the agents:
 
 1. Create an account at [otari.ai](https://otari.ai) and create an API key.
 2. Open **AI model settings** in the assistant.
-3. Paste the Otari key. The published defaults are hosted Otari at `https://api.otari.ai/api/v1` and `alibaba/qwen3.5-397b-a17b` (a model shown in Otari's available-model list). For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
+3. Paste the Otari key. The published router is hosted Otari at `https://api.otari.ai/api/v1`; no model is hard-coded, because Otari retires published models. Save and start reads the live model list and picks a published chat model. For EU-region Otari accounts, use `https://eu.api.otari.ai/api/v1` instead.
 4. Select **Save and start**, then describe a project request.
 
 Do not paste API keys into GitHub, project files, screenshots or chat messages. The reference runtime keeps the BYOK setup in this browser and sends the key only to the configured router. Your messages and any page data the agents read are sent to the model provider you select. To clear the saved setup, use **Delete setup** in the AI model settings, then close the tab.
@@ -60,8 +60,8 @@ BriefBridge uses Otari as its default OpenAI-compatible LLM router. Visitors bri
 
 - US-region router: `https://api.otari.ai/api/v1`
 - EU-region router: `https://eu.api.otari.ai/api/v1`
-- Default model: `alibaba/qwen3.5-397b-a17b` (shown in the Otari available-model list).
-- BriefBridge reads Otari's model catalogue and automatically selects a model explicitly marked as a priced chat model with both `tools` and `tool_choice` support. It keeps the configured preference when eligible; otherwise it chooses the lowest-priced eligible model.
+- No model is hard-coded: providers retire published model IDs.
+- BriefBridge reads Otari's model catalogue and automatically selects a model explicitly marked as a priced chat model with both `tools` and `tool_choice` support, never a TTS or other non-chat model. It chooses the lowest-priced eligible model.
 - If Otari does not expose enough catalogue metadata to verify a suitable model, BriefBridge does not guess; the visitor can choose a verified model manually in advanced settings.
 - The visitor can change the model or provider in the runtime's advanced settings.
 - Model usage may incur charges on the visitor's Otari account; use a key with a suitable budget and model restrictions.

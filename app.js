@@ -1,6 +1,118 @@
 const STORE_KEY = "briefbridge.saved.v1";
 const DRAFT_KEY = "briefbridge.draft.v1";
 
+// The project-type dropdown's own options, mirrored from index.html.
+const PROJECT_TYPE_OPTIONS = ["Marketing", "Branding", "Web design", "Software / product", "Content creation", "Event", "Research", "Other"];
+const PROJECT_TYPE_KEYWORDS = {
+  "Marketing": ["marketing", "campaign", "promotion", "launch", "advertising", "seo", "social media"],
+  "Branding": ["branding", "brand", "identity", "logo"],
+  "Web design": ["web design", "website", "web", "landing page", "ui", "ux"],
+  "Software / product": ["software", "product", "app", "application", "platform", "saas"],
+  "Content creation": ["content", "copywriting", "copy", "blog", "article", "newsletter"],
+  "Event": ["event", "conference", "workshop", "meetup", "webinar"],
+  "Research": ["research", "survey", "analysis", "report"],
+};
+
+function keywordMatches(keyword, lower) {
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i").test(lower);
+}
+
+// Map free text (for example "Branding + Web Design") to the closest dropdown
+// option. Returns "" when nothing matches, so the caller can keep the wording.
+export function mapProjectTypeOption(value) {
+  const raw = text(value, 60);
+  if (!raw) return "";
+  const lower = raw.toLowerCase();
+  const exact = PROJECT_TYPE_OPTIONS.find(option => option.toLowerCase() === lower);
+  if (exact) return exact;
+  let best = "";
+  let bestScore = 0;
+  for (const option of PROJECT_TYPE_OPTIONS) {
+    if (option === "Other") continue;
+    const score = (PROJECT_TYPE_KEYWORDS[option] || []).filter(keyword => keywordMatches(keyword, lower)).length;
+    if (score > bestScore) { bestScore = score; best = option; }
+  }
+  return best;
+}
+
+// Section headings a chat reply may use for a project brief.
+const BRIEF_TEXT_SECTIONS = [
+  ["objective", ["objective", "project objective", "goal"]],
+  ["audience", ["audience", "target audience"]],
+  ["scope", ["scope"]],
+  ["deliverables", ["deliverables"]],
+  ["constraints", ["constraints", "requirements"]],
+  ["timeline", ["timeline"]],
+  ["budget", ["budget"]],
+  ["assumptions", ["assumptions"]],
+  ["openQuestions", ["open questions", "openquestions", "questions"]],
+  ["nextSteps", ["next steps", "nextsteps"]],
+];
+const BRIEF_LIST_FIELDS = new Set(["deliverables", "constraints", "assumptions", "openQuestions", "nextSteps"]);
+
+function sectionFieldFor(heading) {
+  const h = String(heading || "").toLowerCase()
+    .replace(/[*_`]/g, "").replace(/[:：]\s*$/, "").trim();
+  for (const [field, names] of BRIEF_TEXT_SECTIONS) {
+    if (names.includes(h)) return field;
+  }
+  return "";
+}
+
+// Parse a brief written as plain chat text (Markdown headings or "Label:"
+// lines) into brief fields. Returns null unless the text is a complete brief,
+// so ordinary replies never fill the form by accident.
+export function parseBriefText(input) {
+  const source = String(input || "").replace(/\r/g, "");
+  if (!source.trim()) return null;
+  const collected = {};
+  const lists = {};
+  let section = "";
+  let sawMarker = false;
+  const clean = (line) => line.replace(/^[\s>*#-]+/, "").replace(/^\d+[.)]\s+/, "").replace(/[*_`]/g, "").trim();
+  for (const rawLine of source.split("\n")) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const titleMatch = line.match(/^#\s+(.+)/) || line.match(/^\*\*Title:\*\*\s*(.+)/i);
+    if (titleMatch && !collected.title) {
+      collected.title = clean(titleMatch[1]);
+      continue;
+    }
+    const clientMatch = line.match(/^\*\*Client:\*\*\s*(.+)/i);
+    if (clientMatch) { collected.client = clean(clientMatch[1]); continue; }
+    const typeMatch = line.match(/^\*\*Project type:\*\*\s*(.+)/i);
+    if (typeMatch) { collected.projectType = clean(typeMatch[1]); sawMarker = true; continue; }
+    const headingMatch = line.match(/^#{1,4}\s+(.+)/) || line.match(/^\*\*(.+?)\*\*:?\s*$/);
+    if (headingMatch) {
+      const field = sectionFieldFor(headingMatch[1]);
+      if (field) { section = field; sawMarker = true; continue; }
+    }
+    const labelMatch = line.match(/^([A-Za-z][A-Za-z ]{2,30}):\s*(.*)$/);
+    if (labelMatch) {
+      const field = sectionFieldFor(labelMatch[1]);
+      if (field) {
+        section = field;
+        sawMarker = true;
+        const rest = labelMatch[2].trim();
+        if (rest) {
+          if (BRIEF_LIST_FIELDS.has(field)) (lists[field] ||= []).push(clean(rest));
+          else collected[field] = [collected[field], clean(rest)].filter(Boolean).join(" ");
+        }
+        continue;
+      }
+    }
+    if (!section) continue;
+    const value = clean(line);
+    if (!value) continue;
+    if (BRIEF_LIST_FIELDS.has(section)) (lists[section] ||= []).push(value);
+    else collected[section] = [collected[section], value].filter(Boolean).join(" ");
+  }
+  if (!sawMarker) return null;
+  const brief = normalizeBrief({ ...collected, ...lists });
+  return validateBrief(brief).ok ? brief : null;
+}
+
 const text = (value, max = 1200) => String(value ?? "").trim().slice(0, max);
 const lines = (value, maxItems = 12) => {
   const values = Array.isArray(value) ? value : String(value ?? "").split(/\r?\n/);
@@ -185,6 +297,22 @@ export class App {
       const item = readSaved().find(entry => entry.id === id);
       return item ? { ok: true, title: item.brief.title } : { ok: false, reason: "That saved brief no longer exists. Refresh the workspace and try again." };
     },
+    // Fill the on-page brief form from assistant-provided details. Only fills;
+    // saving still goes through save_brief or the Save button.
+    fillBriefForm(input = {}) {
+      if (typeof document === "undefined") return { ok: false, reason: "The brief form is not available." };
+      const form = document.querySelector("#brief-form");
+      if (!form) return { ok: false, reason: "The brief form is not available." };
+      setFormValues(input);
+      const draft = readFormBrief();
+      persistDraft(draft);
+      renderPreview(draft);
+      const filled = Object.keys(normalizeBrief(input)).filter(key => {
+        const value = draft[key];
+        return Array.isArray(value) ? value.length > 0 : !!value;
+      });
+      return { ok: true, filled };
+    },
     deleteBrief(id) {
       const check = this.checkDeleteBrief(id);
       if (!check.ok) return { ok: false, reason: check.reason };
@@ -203,6 +331,24 @@ function setFormValues(brief) {
   for (const [key, value] of Object.entries(normalizeBrief(brief))) {
     const field = form.elements.namedItem(key);
     if (!field) continue;
+    if (key === "projectType" && field.tagName === "SELECT") {
+      const raw = text(value, 60);
+      const mapped = mapProjectTypeOption(raw);
+      if (mapped) { field.value = mapped; continue; }
+      // Keep unmapped wording visible in the dropdown instead of showing blank.
+      if (raw && raw !== "Other") {
+        if (![...field.options].some(option => option.value === raw)) {
+          const option = document.createElement("option");
+          option.value = raw;
+          option.textContent = raw;
+          field.append(option);
+        }
+        field.value = raw;
+      } else {
+        field.value = "Other";
+      }
+      continue;
+    }
     field.value = Array.isArray(value) ? value.join("\n") : value;
   }
 }
