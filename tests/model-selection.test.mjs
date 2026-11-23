@@ -83,3 +83,11 @@ test("a 402 pricing_required error becomes a plain message", async () => {
   assert.ok(words(PRICING_REQUIRED_MESSAGE) <= 10);
   assert.equal(friendlyModelError("LLM HTTP 500: upstream error"), "LLM HTTP 500: upstream error");
 });
+
+test("a catalog without chat metadata keeps manual models but still drops TTS", async () => {
+  const { chatModelIds, checkChatModel } = await import("../runtime/model-selection.js");
+  const plain = [{ id: "vendor/plain-chat" }, { id: "alibaba/qwen3-tts" }];
+  assert.deepEqual(chatModelIds(plain), ["vendor/plain-chat"]);
+  assert.equal(checkChatModel("vendor/plain-chat", plain).ok, true);
+  assert.equal(checkChatModel("alibaba/qwen3-tts", plain).ok, false);
+});

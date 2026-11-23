@@ -32,8 +32,15 @@ export function selectAutomaticChatModel(catalog, preferredIds = []) {
 }
 
 // IDs of the catalog models the chat selector may offer.
+// Catalogs without chat metadata (plain OpenAI-compatible lists) cannot be
+// judged, so only speech/TTS IDs are left out of them.
+const hasChatMetadata = (catalog) => catalog.some((item) => typeof item?.type === "string" || Array.isArray(item?.supported_parameters));
 export function chatModelIds(catalog) {
-  return Array.isArray(catalog) ? catalog.filter(isSuitableChatModel).map((item) => item.id) : [];
+  if (!Array.isArray(catalog)) return [];
+  const usable = hasChatMetadata(catalog)
+    ? catalog.filter(isSuitableChatModel)
+    : catalog.filter((item) => typeof item?.id === "string" && !NON_COMPLETION_MODEL_ID.test(item.id));
+  return usable.map((item) => item.id);
 }
 
 // Check a chosen, typed or saved model against the live catalog. A model that
