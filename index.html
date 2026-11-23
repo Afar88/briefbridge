@@ -65,22 +65,23 @@
           <div>
             <p class="eyebrow">AI assistant</p>
             <h2 id="assistant-heading" class="section-title">Have a rough idea? Let's shape it.</h2>
-            <p class="section-lede">The assistant asks what's missing, fills the brief form, and only saves after you approve.</p>
+            <p class="section-lede">The assistant fills fields and saves only after approval.</p>
           </div>
         </div>
-        <p id="assistant-status" class="status-line" role="status">Loading the assistant… The brief builder still works if it's unavailable.</p>
+        <p id="assistant-status" class="status-line" role="status">Loading the assistant. The brief builder still works alone.</p>
         <div class="assistant-shell">
           <div id="agent-app">
             <div data-ns-slot="header"></div>
             <details class="assistant-settings">
               <summary><span class="step-num">1</span> Connect your AI key</summary>
-              <p class="settings-tip">Paste your key here, never in the chat. Use a key with a small spending limit.</p>
+              <p class="settings-tip">Paste key here, not in chat. Set a low limit.</p>
               <div data-ns-slot="settings"></div>
             </details>
             <div class="assistant-panels"><div data-ns-slot="chat"></div><div data-ns-slot="agents"></div></div>
           </div>
         </div>
-        <p class="fine-print">Your messages go to the AI provider you choose. Your key stays in this browser. Delete your setup before sharing this device.</p>
+        <p class="fine-print">Your chat uses your chosen AI. Your key stays here.</p>
+        <p class="fine-print">Clear setup before sharing this device.</p>
       </div>
     </section>
 
@@ -89,7 +90,7 @@
         <div>
           <p class="eyebrow">Brief builder</p>
           <h2 id="workspace-heading" class="section-title">Your project brief</h2>
-          <p class="section-lede">Fill it in yourself, or let the assistant fill it. Required fields are marked *.</p>
+          <p class="section-lede">Fill it in, or let AI help. * means required.</p>
         </div>
         <button class="button button-outline" id="fill-example" type="button">Load a sample</button>
       </div>

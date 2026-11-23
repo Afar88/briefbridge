@@ -1,18 +1,20 @@
 /* BriefBridge theme for the nsdeploy browser runtime. */
-#agent-app{--ns-font:"DM Sans",system-ui,sans-serif;--ns-bg:#172337;--ns-fg:#f3f6fa;--ns-primary:#c5f36b;--ns-accent:#c5f36b;--ns-border:rgba(196,211,231,.22);--ns-panelbg:#172337;--ns-msgbg:#22344e;--ns-muted:#a3b0c2;color-scheme:dark;display:grid;gap:16px;font-size:15px}
-#agent-app button{margin:0;font-family:inherit}
+#agent-app{--ns-font:"DM Sans",system-ui,sans-serif;--ns-bg:#172337;--ns-fg:#f3f6fa;--ns-primary:#c5f36b !important;--ns-accent:#c5f36b !important;--ns-border:rgba(196,211,231,.22);--ns-panelbg:#172337;--ns-msgbg:#22344e;--ns-muted:#a3b0c2;--ns-user-fg:#14200f;color-scheme:dark;display:grid;gap:var(--s3);width:100%;min-width:0;font-size:16px}
+#agent-app button{min-height:44px;margin:0;font-family:inherit}
+#agent-app a{display:inline-flex;align-items:center;min-height:44px;max-width:100%;overflow-wrap:anywhere}
+#agent-app input:not([type=checkbox]):not([type=radio]):not([type=file]),#agent-app select{min-height:44px}
 #agent-app input,#agent-app textarea,#agent-app select{background:#0f1929;color:#f3f6fa;border-color:rgba(196,211,231,.28);font-size:16px}
 #agent-app input[type=checkbox],#agent-app input[type=radio]{width:auto}
-#agent-app .ns-header{border:1px solid var(--ns-border);border-radius:12px;flex-wrap:wrap}
+#agent-app .ns-header{border:1px solid var(--ns-border);border-radius:12px;flex-wrap:wrap;background:#172337}
 #agent-app .ns-chat{background:var(--ns-bg);border:1px solid var(--ns-border);border-radius:16px;overflow:hidden}
-#agent-app .ns-agents,#agent-app .ns-dev{border:1px solid var(--ns-border);border-radius:16px}
-#agent-app .ns-msg{overflow-wrap:anywhere;font-size:15px;line-height:1.55}
-#agent-app .ns-inputbar button,#agent-app .ns-settings-body button,#agent-app .ns-w-btn,#agent-app .ns-devtoggle{min-height:44px;padding:0 16px;font-weight:700;border-radius:10px}
+#agent-app .ns-agents,#agent-app .ns-dev{border:1px solid var(--ns-border);border-radius:16px;background:#172337}
+#agent-app .ns-msg{overflow-wrap:anywhere;word-break:break-word;font-size:16px;line-height:1.55}
+#agent-app .ns-inputbar button,#agent-app .ns-settings-body button,#agent-app .ns-w-btn,#agent-app .ns-devtoggle{min-height:44px;padding:0 var(--s3);font-weight:700;border-radius:10px}
 #agent-app .ns-inputbar button,#agent-app .ns-settings-body button:not(.ghost){color:#14200f}
 #agent-app button.ns-modal-close{min-width:44px;min-height:44px}
-#agent-app .ns-w-choice{color:#f3f6fa}
-#agent-app .ns-settings-body label,#agent-app .ns-widget label{margin:4px 0;font-weight:600;color:#c9d3e0}
-#agent-app .ns-settings-body input,#agent-app .ns-settings-body select{min-height:44px;padding:8px 12px;font-size:16px;border-radius:10px}
+#agent-app .ns-w-choice{background:#22344e;color:#f3f6fa;border-color:var(--ns-border);white-space:normal;overflow-wrap:anywhere}
+#agent-app .ns-settings-body label,#agent-app .ns-widget label{margin:var(--s1) 0;font-weight:600;color:#c9d3e0}
+#agent-app .ns-settings-body input,#agent-app .ns-settings-body select{min-height:44px;padding:var(--s2) var(--s3);font-size:16px;border-radius:10px}
 #agent-app .ns-consent{background:#1c2b42;color:#f3f6fa;border:1px solid #c5f36b66}
 #agent-app .ns-consent-actions{flex-wrap:wrap}
 #agent-app .ns-consent-actions button{white-space:nowrap}
@@ -20,46 +22,45 @@
 
 /* Step 1 settings sit above the chat. */
 #agent-app .assistant-settings{border:1px solid rgba(196,211,231,.28);border-radius:16px;background:#1c2b42;overflow:hidden}
-#agent-app .assistant-settings>summary{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;font:800 17px Manrope,"DM Sans",sans-serif;color:#f3f6fa;cursor:pointer;list-style-position:inside}
+#agent-app .assistant-settings>summary{display:flex;align-items:center;gap:var(--s3);min-height:56px;padding:0 var(--s3);font:800 17px Manrope,"DM Sans",sans-serif;color:#f3f6fa;cursor:pointer;list-style-position:inside}
 #agent-app .assistant-settings>summary::marker{color:#c5f36b}
 #agent-app .assistant-settings[open]>summary{border-bottom:1px solid rgba(196,211,231,.18)}
-#agent-app .assistant-settings .settings-tip{margin:12px 16px 0;font-size:14px;color:#a3b0c2}
-#agent-app .assistant-settings .ns-settings-body{padding:12px 16px 16px;gap:10px;font-size:15px}
+#agent-app .assistant-settings .settings-tip{margin:var(--s3) var(--s3) 0;font-size:14px;color:#a3b0c2}
+#agent-app .assistant-settings .ns-settings-body{padding:var(--s3);gap:var(--s2);font-size:15px}
 
-.assistant-panels{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px}
+.assistant-panels{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:var(--s3);min-width:0}
 #agent-app.ns-composed-app [data-ns-slot=chat]{height:620px}
-#agent-app .ns-read-row{align-self:flex-start;margin:-2px 0 4px}
-#agent-app .ns-read-row button{min-height:44px;min-width:44px;padding:0 14px;border-radius:10px;border:1px solid rgba(196,211,231,.28);background:transparent;color:#c9d3e0;font-size:14px;font-weight:700;cursor:pointer}
+#agent-app .ns-read-row{align-self:flex-start;margin:0 0 var(--s1)}
+#agent-app .ns-read-row button{min-height:44px;min-width:44px;padding:0 var(--s3);border-radius:10px;border:1px solid rgba(196,211,231,.28);background:transparent;color:#c9d3e0;font-size:14px;font-weight:700;cursor:pointer}
 #agent-app .ns-read-row button[aria-pressed="true"]{border-color:#c5f36b;color:#c5f36b}
 
 /* Save and delete review dialog, in the site palette. */
-body>dialog h2{margin:0 0 12px;font:800 20px Manrope,"DM Sans",sans-serif}
-.assistant-review{max-width:620px;width:calc(100% - 32px);max-height:85vh;overflow:auto;border:1px solid rgba(196,211,231,.28);border-radius:16px;padding:24px;background:#172337;color:#f3f6fa;font:15px/1.55 "DM Sans",system-ui,sans-serif}
+body>dialog{background:#172337;color:#f3f6fa;border-color:rgba(196,211,231,.28)}
+body>dialog h2{margin:0 0 var(--s3);font:800 20px Manrope,"DM Sans",sans-serif}
+.assistant-review{max-width:620px;width:calc(100% - 32px);max-height:85vh;overflow:auto;border:1px solid rgba(196,211,231,.28);border-radius:16px;padding:var(--s4);background:#172337;color:#f3f6fa;font:15px/1.55 "DM Sans",system-ui,sans-serif}
 .assistant-review::backdrop{background:rgba(5,10,18,.7)}
-.assistant-review dl{display:grid;grid-template-columns:fit-content(35%) 1fr;gap:6px 16px;margin:16px 0}
+.assistant-review dl{display:grid;grid-template-columns:fit-content(35%) 1fr;gap:var(--s1) var(--s3);margin:var(--s3) 0}
 .assistant-review dt{font-weight:700;color:#c5f36b}
 .assistant-review dd{margin:0;overflow-wrap:anywhere}
 .assistant-review pre{white-space:pre-wrap;overflow-wrap:anywhere}
-.assistant-review button{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid transparent;background:#c5f36b;color:#14200f;font-weight:700;margin-right:8px}
+.assistant-review button{min-height:44px;padding:0 var(--s3);border-radius:10px;border:1px solid transparent;background:#c5f36b;color:#14200f;font-weight:700;margin-right:var(--s2)}
 .assistant-review .assistant-decline{background:transparent;color:#f3f6fa;border-color:rgba(196,211,231,.4)}
 
 @media(max-width:760px){
   .assistant-panels{grid-template-columns:1fr}
   #agent-app.ns-composed-app [data-ns-slot=chat]{height:560px}
   .assistant-review dl{grid-template-columns:1fr;gap:0}
-  .assistant-review dd{margin-bottom:8px}
+  .assistant-review dd{margin-bottom:var(--s2)}
 }
 
 /* Lime is the brand accent, so text on it is dark for contrast. */
-#agent-app{--ns-user-fg:#14200f}
 #agent-app .ns-consent-actions button,#agent-app .ns-linker-form button,#agent-app .ns-w-btn,#agent-app .ns-node.active,#agent-app .ns-send{color:#14200f}
-#agent-app .ns-widget{background:#1c2b42;color:#f3f6fa}
+#agent-app .ns-widget{background:#1c2b42;color:#f3f6fa;border:1px solid var(--ns-border);border-radius:10px}
 #agent-app .ns-w-choice:hover:not(:disabled),#agent-app .ns-w-choice:disabled:hover{background:#22344e}
+#agent-app .ns-tbox{background:#0f1929;color:#f3f6fa;border:1px solid var(--ns-border)}
 #agent-app .ns-tbox.active{background:#22344e}
 #agent-app .ns-key-providers a{background:transparent}
-/* The manifest theme sets a dark green inline; the site accent wins. */
-#agent-app{--ns-primary:#c5f36b !important;--ns-accent:#c5f36b !important}
-#agent-app .ns-anode{background:#22344e;color:#f3f6fa}
+#agent-app .ns-anode{background:#22344e;color:#f3f6fa;border:1px solid var(--ns-border);border-radius:10px;max-width:100%;overflow-wrap:anywhere}
 #agent-app .ns-key-help{background:#14213a}
 #agent-app summary{display:flex;align-items:center;min-height:44px;cursor:pointer}
 #agent-app .ns-key-help>a{display:inline-flex;align-items:center;min-height:44px}
