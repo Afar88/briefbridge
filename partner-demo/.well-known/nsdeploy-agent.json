@@ -1,0 +1,7 @@
+{
+  "protocol": "nsdeploy-agent-mcp/v1",
+  "network": "shopstart_network",
+  "front_man": "shopstart_coordinator",
+  "available": false,
+  "reason": "ShopStart publishes a browser-callable network and does not run a separate MCP server."
+}
