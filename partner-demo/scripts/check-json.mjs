@@ -133,7 +133,7 @@ const [handoffSource, executionStreamSource, stylesheet, uiSource] = await Promi
 assert.match(networkJson.tools[0].instructions, /pass it on word for word/);
 assert.match(networkJson.tools[0].instructions, /Never summarise, paraphrase, shorten/);
 assert.match(siteSource, /briefBridgePeerText/);
-assert.match(siteSource, /peerReply || completed?.text/, "ShopStart must keep its old summary fallback when no peer reply arrives");
+assert.match(siteSource, /else if \(completed\?\.text\)/, "ShopStart must keep its old summary fallback when no peer reply arrives");
 assert.match(handoffSource, /REQUIRED_BRIEF_HEADINGS/);
 assert.ok(executionStreamSource.includes('resultText: typeof ev.text === "string" ? ev.text : ""'), "agent completion carries the full reply");
 assert.match(uiSource, /<textarea id="ns-input"/);
