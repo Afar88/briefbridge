@@ -50,6 +50,47 @@ export function asksToDeleteBrief(message) {
   return /\b(delete|remove)\b/i.test(value) && /\b(brief|it|that|this|saved|library)\b/i.test(value);
 }
 
+const capitalize = value => value ? value[0].toUpperCase() + value.slice(1) : value;
+
+// Draft a reviewable brief straight from the visitor's own request, used when
+// they ask to save but the assistant left the form empty. Unknown details go
+// to open questions so nothing is invented.
+export function draftFromRequest(message) {
+  const sentences = String(message || "")
+    .split(/(?<=[.!?])\s+/)
+    .map(part => part.trim())
+    .filter(part => part && !/\b(save|store|fill|form|library)\b/i.test(part));
+  const request = sentences.join(" ");
+  if (!request) return null;
+  const need = request.match(/\b(?:i|we)\s+(?:need|want|would like)\s+(.+?)(?:[.!?]|$)/i);
+  if (!need) return null;
+  const [what, context = ""] = need[1].split(/\s+for\s+(?:my|our|a|an|the)?\s*/i);
+  const deliverables = what
+    .split(/\s*(?:,|\band\b|\bplus\b)\s*/i)
+    .map(item => item.replace(/^(?:a|an|the|some)\s+/i, "").trim())
+    .filter(Boolean)
+    .map(capitalize);
+  if (!deliverables.length) return null;
+  const clauses = sentences.flatMap(part => part.split(/,\s*/));
+  const find = pattern => capitalize(clauses.find(part => pattern.test(part)) || "");
+  const budget = find(/\b(budget|\$|usd|naira|₦|eur|£)/i).replace(/\.$/, "");
+  const timeline = find(/\b(ready|deadline|weeks?|days?|months?|by\s+\w+)\b/i).replace(/\.$/, "");
+  const title = `${deliverables.join(" and ")}${context ? ` for ${context.replace(/[.!?]$/, "")}` : ""}`;
+  const brief = normalizeBrief({
+    title,
+    client: context ? capitalize(context.replace(/[.!?]$/, "")) : "",
+    projectType: mapProjectTypeOption(deliverables.join(" ")),
+    objective: request,
+    audience: "To confirm with the client.",
+    deliverables,
+    timeline,
+    budget,
+    assumptions: ["Drafted from your request. Review before saving."],
+    openQuestions: ["Who is the main audience?", "What style or brand feel do you want?"],
+  });
+  return validateBrief(brief).ok ? brief : null;
+}
+
 // Section headings a chat reply may use for a project brief.
 const BRIEF_TEXT_SECTIONS = [
   ["objective", ["objective", "project objective", "goal"]],

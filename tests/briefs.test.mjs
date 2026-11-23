@@ -207,3 +207,15 @@ test("detects clear save and delete requests, never negated ones", async () => {
   assert.equal(asksToDeleteBrief("Do not delete my brief."), false);
   assert.equal(asksToDeleteBrief("Please save the brief."), false);
 });
+
+test("drafts a valid brief from a plain save request", async () => {
+  const { draftFromRequest } = await import("../app.js");
+  const brief = draftFromRequest("I need a logo and a one-page website for my small bakery in Lagos. Budget about $300, ready in three weeks. Please fill in the brief form and save the brief.");
+  assert.ok(brief);
+  assert.deepEqual(brief.deliverables, ["Logo", "One-page website"]);
+  assert.equal(brief.title, "Logo and One-page website for small bakery in Lagos");
+  assert.equal(brief.budget, "Budget about $300");
+  assert.equal(brief.timeline, "Ready in three weeks");
+  assert.equal(brief.objective.includes("save"), false);
+  assert.equal(draftFromRequest("Please save the brief now."), null);
+});

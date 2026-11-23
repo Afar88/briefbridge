@@ -1,4 +1,4 @@
-import { App, asksToDeleteBrief, asksToSaveBrief, parseBriefText } from "./app.js";
+import { App, asksToDeleteBrief, asksToSaveBrief, draftFromRequest, parseBriefText, validateBrief } from "./app.js";
 import { boot } from "./runtime/index.js";
 
 const DIALOGS = {
@@ -154,8 +154,15 @@ function reviewItem(action, args) {
 // A clear save request always reaches the save dialog: when the assistant
 // did not call save_brief itself, the page opens the same review dialog for
 // the brief in the form. Nothing is saved unless the visitor confirms.
-async function ensureSaveReviewed() {
-  const draft = App.page.getWorkspaceState().currentDraft;
+async function ensureSaveReviewed(requests) {
+  let draft = App.page.getWorkspaceState().currentDraft;
+  if (!validateBrief(draft).ok) {
+    const fromRequest = requests.map(draftFromRequest).find(Boolean);
+    if (fromRequest) {
+      App.page.fillBriefForm(fromRequest);
+      draft = App.page.getWorkspaceState().currentDraft;
+    }
+  }
   const item = reviewItem("save_brief", draft);
   const details = detailsFor(item);
   if (details.refusal) {
@@ -192,8 +199,10 @@ async function ensureDeleteReviewed(message) {
 
 function watchAssistantReplies(engine) {
   const original = engine.streamTurn.bind(engine);
+  const requests = [];
   engine.streamTurn = (userText, ...rest) => {
     reviewedThisTurn.clear();
+    requests.unshift(String(userText || ""));
     const stream = original(userText, ...rest);
     const wrapped = (async function* () {
       let completed = null;
@@ -203,7 +212,7 @@ function watchAssistantReplies(engine) {
       }
       try { maybeFillBriefFromReply(completed?.text); } catch { /* never break a reply */ }
       try {
-        if (asksToSaveBrief(userText) && !reviewedThisTurn.has("save_brief")) await ensureSaveReviewed();
+        if (asksToSaveBrief(userText) && !reviewedThisTurn.has("save_brief")) await ensureSaveReviewed(requests);
         else if (asksToDeleteBrief(userText) && !reviewedThisTurn.has("delete_brief")) await ensureDeleteReviewed(userText);
       } catch (error) { console.error("BriefBridge review failed", error); }
     })();
