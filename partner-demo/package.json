@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check ./site.js && node ./scripts/check-json.mjs"
+    "check": "node --check ./site.js && node --check ./brief-handoff.js && node ./scripts/check-json.mjs && node --test ./tests/*.test.mjs"
   }
 }

@@ -1,10 +1,12 @@
 import { boot } from "./runtime/index.js";
 import { isStructuredBrief } from "./partner-result.js";
+import { briefBridgePeerText, briefBridgeUrl } from "./brief-handoff.js";
 
 const status = document.querySelector("#assistant-status");
 const resultPanel = document.querySelector("#partner-result");
 const resultNote = document.querySelector("#partner-result-note");
 const resultText = document.querySelector("#partner-result-text");
+const resultLink = document.querySelector("#open-briefbridge-result");
 
 function showPartnerReply(value) {
   const text = typeof value === "string"
@@ -13,10 +15,11 @@ function showPartnerReply(value) {
   if (!text.trim()) return;
 
   const hasDraft = isStructuredBrief(text);
-  resultText.textContent = text.trim();
+  resultText.textContent = text;
   resultNote.textContent = hasDraft
     ? "BriefBridge returned a draft. Review it before you use it."
-    : "BriefBridge replied, but its partner mode does not return drafts yet.";
+    : "BriefBridge replied without a full brief. Open BriefBridge to finish it.";
+  resultLink.href = briefBridgeUrl(text);
   resultPanel.hidden = false;
   resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -27,16 +30,30 @@ function watchCompletedTurns(engine) {
     const stream = original(userText, ...rest);
     const wrapped = (async function* () {
       let completed = null;
+      let peerReply = null;
       for await (const event of stream) {
+        const peerText = briefBridgePeerText(event);
+        if (peerText) peerReply = peerText;
         if (event?.type === "turn.completed") completed = event.result;
         yield event;
       }
-      if (completed?.text) showPartnerReply(completed.text);
+      // Show BriefBridge's full peer completion, not ShopStart's summary.
+      // Keep the old root reply as a fallback when no peer reply was returned.
+      if (peerReply) showPartnerReply(peerReply);
+      else if (completed?.text) showPartnerReply(completed.text);
     })();
     wrapped.steer = stream.steer;
     return wrapped;
   };
 }
+
+document.addEventListener("click", event => {
+  if (!event.target.closest?.("#ns-newchat")) return;
+  resultPanel.hidden = true;
+  resultText.textContent = "";
+  resultNote.textContent = "";
+  resultLink.href = "https://briefbridge-bpxd.onrender.com";
+});
 
 async function startShopStart() {
   const siteBase = new URL("./", import.meta.url).href;

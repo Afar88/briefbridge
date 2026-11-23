@@ -157,6 +157,8 @@ export function createTurnEventStream(trace, runTurn, streamToken) {
       queue.push(base("agent.completed", ev, {
         source: { origin: ev.origin, network: ev.network, agent: ev.agent, invocationId: ev.invocation },
         resultPreview: preview(ev.text || ""),
+        // Keep the complete peer reply available to trusted in-page consumers.
+        resultText: typeof ev.text === "string" ? ev.text : "",
         visibility: "user",
       }));
     } else if (ev.phase === "end" && ev.status === "error" && ev.kind === "agent") {
