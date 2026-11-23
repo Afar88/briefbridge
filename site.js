@@ -1,5 +1,5 @@
 import { createReadAloud, VOICE_SETTING_KEY } from "./read-aloud.js";
-import { App, asksToDeleteBrief, asksToSaveBrief, draftFromRequest, parseBriefText, validateBrief } from "./app.js";
+import { App, asksToDeleteBrief, asksToSaveBrief, draftFromRequest, normalizeBrief, parseBriefText, validateBrief } from "./app.js";
 import { boot } from "./runtime/index.js";
 
 const DIALOGS = {
@@ -72,13 +72,15 @@ function openReview(content, exact) {
       }
       dialog.append(list);
     }
-    const technical = document.createElement("details");
-    const summary = document.createElement("summary");
-    const pre = document.createElement("pre");
-    summary.textContent = "Technical details";
-    pre.textContent = exact;
-    technical.append(summary, pre);
-    dialog.append(technical);
+    if (exact) {
+      const technical = document.createElement("details");
+      const summary = document.createElement("summary");
+      const pre = document.createElement("pre");
+      summary.textContent = "Technical details";
+      pre.textContent = exact;
+      technical.append(summary, pre);
+      dialog.append(technical);
+    }
 
     const confirm = document.createElement("button");
     confirm.type = "button";
@@ -100,6 +102,32 @@ function openReview(content, exact) {
     heading.focus();
   });
 }
+
+const CLEAR_FORM_DIALOG = {
+  title: "Clear the brief form too?",
+  sentence: "New chat cleared the conversation. The form still has a draft that is not saved.",
+  confirm: "Clear form",
+  decline: "Keep form",
+};
+
+function formHasUnsavedDraft() {
+  const state = App.page.getWorkspaceState();
+  const { projectType, ...rest } = state.currentDraft || {};
+  const filled = Object.values(rest).some(value => Array.isArray(value) ? value.length : Boolean(value));
+  if (!filled) return false;
+  const current = JSON.stringify(state.currentDraft);
+  return !(state.savedBriefs || []).some(({ id }) => JSON.stringify(normalizeBrief(App.page.getBrief(id)?.brief)) === current);
+}
+
+// New chat only resets the conversation; when the form holds an unsaved
+// draft, ask whether to clear it too, so a fresh chat can fill a fresh form.
+document.addEventListener("click", async event => {
+  if (!event.target.closest?.("#ns-newchat")) return;
+  if (!formHasUnsavedDraft()) return;
+  const clear = await openReview(CLEAR_FORM_DIALOG, "");
+  if (clear) document.querySelector("#reset-form")?.click();
+  document.querySelector("#ns-input")?.focus();
+}, true);
 
 // Save/delete actions the assistant asked to run during the current turn.
 const reviewedThisTurn = new Set();
