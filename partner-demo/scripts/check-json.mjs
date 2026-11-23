@@ -60,7 +60,7 @@ assert.equal(linkWellKnown.exports?.[0]?.front_man, "shopstart_coordinator");
 assert.equal(agentWellKnown.protocol, "nsdeploy-agent-mcp/v1");
 assert.equal(agentWellKnown.available, false);
 assert.equal(packageJson.type, "module");
-assert.equal(packageJson.scripts?.check, "node --check ./site.js && node ./scripts/check-json.mjs");
+assert.equal(packageJson.scripts?.check, "node --check ./site.js && node --check ./brief-handoff.js && node ./scripts/check-json.mjs && node --test ./tests/*.test.mjs");
 
 const sampleBrief = [
   "## Project", "Salon website",
@@ -83,7 +83,7 @@ assert.equal(isStructuredBrief(sampleBrief.replace("## Budget", "## Extras")), f
 assert.ok(html.includes('Made by BriefBridge'), "result panel must identify BriefBridge as the source");
 assert.match(html, /class="button button-primary open-briefbridge"[\s\S]*?href="https:\/\/briefbridge-bpxd\.onrender\.com"/);
 assert.match(html, /class="button button-primary open-briefbridge"[\s\S]*?target="_blank" rel="noopener noreferrer"/);
-assert.match(siteSource, /resultText\.textContent = text\.trim\(\)/, "the actual peer text must be shown safely");
+assert.match(siteSource, /resultText\.textContent = text/, "the full peer text must be shown safely");
 assert.match(siteSource, /isStructuredBrief\(text\)/);
 assert.doesNotMatch(siteSource, /innerHTML/, "peer reply must not be rendered as HTML");
 
@@ -122,6 +122,33 @@ assert.doesNotMatch(render, /^\s+envVars:/m, "ShopStart must not configure serve
 
 const secretMaterial = [JSON.stringify(manifest), JSON.stringify(networkJson), html, siteSource, render].join("\n");
 assert.doesNotMatch(secretMaterial, /(?:sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{20,})/, "no literal API credentials may be committed");
+
+
+const [handoffSource, executionStreamSource, stylesheet, uiSource] = await Promise.all([
+  readText("brief-handoff.js"),
+  readText("runtime/execution-stream.js"),
+  readText("styles.css"),
+  readText("runtime/ui.js")
+]);
+assert.match(networkJson.tools[0].instructions, /pass it on word for word/);
+assert.match(networkJson.tools[0].instructions, /Never summarise, paraphrase, shorten/);
+assert.match(siteSource, /briefBridgePeerText/);
+assert.match(siteSource, /else if \(completed\?\.text\)/, "ShopStart must keep its old summary fallback when no peer reply arrives");
+assert.match(handoffSource, /REQUIRED_BRIEF_HEADINGS/);
+assert.ok(executionStreamSource.includes('resultText: typeof ev.text === "string" ? ev.text : ""'), "agent completion carries the full reply");
+assert.match(uiSource, /<textarea id="ns-input"/);
+assert.match(uiSource, /Shift\+Enter adds a line/);
+assert.doesNotMatch(stylesheet, /\blime\b|\bgreen\b|background:\s*#fff(?:fff)?\b/i, "ShopStart uses navy and red, not green or white panels");
+
+for (const path of [
+  "screenshots/shopstart-desktop-before-after.jpg",
+  "screenshots/shopstart-phone-before-after.jpg"
+]) {
+  const image = await readFile(resolve(root, path));
+  assert.ok(image.length > 3000, path + " must be a real screenshot");
+  assert.equal(image[0], 0xff, path + " must be a JPEG");
+  assert.equal(image[1], 0xd8, path + " must be a JPEG");
+}
 
 console.log("ShopStart JSON, display, privacy and Render checks passed.");
 console.log("Network: shopstart_network; front agent: shopstart_coordinator.");
