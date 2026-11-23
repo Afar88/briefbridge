@@ -129,6 +129,16 @@
 
 Your structured brief will appear here as you fill in the form.</pre>
           </section>
+          <div class="read-aloud-bar">
+            <button class="button button-outline read-aloud" id="read-brief" type="button" aria-pressed="false">Read aloud</button>
+            <label class="voice-setting"><span>Voice</span>
+              <select id="voice-source">
+                <option value="browser">Browser voice (free)</option>
+                <option value="otari">Otari voice (your key)</option>
+              </select>
+            </label>
+            <p class="voice-note" id="voice-note" role="status" aria-live="polite"></p>
+          </div>
           <section class="saved-panel" id="saved-library" aria-labelledby="saved-library-heading">
             <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3 id="saved-library-heading">Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
             <div id="saved-briefs" class="saved-list"><p class="empty-state">Your saved briefs will appear here.</p></div>

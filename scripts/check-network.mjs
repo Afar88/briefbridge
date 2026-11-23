@@ -146,7 +146,7 @@ if (!manifest.actions?.module || !manifest.actions?.bridge) fail("The action mod
 
 for (const path of [
   "runtime/index.js", "runtime/engine.js", "runtime/runner.js",
-  "runtime/sandbox-worker.js", "runtime/ui.js", "site-actions.js",
+  "runtime/sandbox-worker.js", "runtime/ui.js", "site-actions.js", "read-aloud.js",
   "site.js", "links.json", "agent-mcp.json", "bridge/action-bridge.html",
   "bridge/agent-manifest.json", ".well-known/nsdeploy.json",
   ".well-known/nsdeploy-agent.json"

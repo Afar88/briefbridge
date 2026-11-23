@@ -189,3 +189,14 @@ body>dialog button{margin-right:8px}
 .optional-fields-content{display:grid;gap:16px;padding:16px}
 .optional-fields-content .form-row{margin:0}
 @media(max-width:680px){.optional-fields-content{padding:13px}.optional-fields>summary{align-items:flex-start}}
+
+.read-aloud-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0 0}
+.read-aloud{min-height:44px;min-width:44px;font-size:12px;font-weight:800}
+.read-aloud[aria-pressed="true"]{border-color:var(--lime);color:var(--lime)}
+.voice-setting{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#c9d4e2}
+.voice-setting select{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:#101a2a;color:var(--ink);font-weight:700}
+.voice-note{flex-basis:100%;margin:0;font-size:12px;font-weight:700;color:var(--lime)}
+.voice-note:empty{display:none}
+#agent-app .ns-read-row{align-self:flex-start;margin:-2px 0 4px}
+#agent-app .ns-read-row button{min-height:44px;min-width:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:transparent;color:#d3dce8;font-size:12px;font-weight:800;cursor:pointer}
+#agent-app .ns-read-row button[aria-pressed="true"]{border-color:var(--lime);color:var(--lime)}

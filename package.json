@@ -5,7 +5,7 @@
   "type": "module",
   "description": "A browser-first open agentic website for turning project requests into clear briefs, using Mozilla Otari.",
   "scripts": {
-    "check": "node --check app.js && node --check runtime/ui.js && node --check runtime/model-selection.js && node --check site.js && node --check site-actions.js && node --check scripts/smoke-live.mjs && node scripts/check-network.mjs && node --test tests/*.test.mjs",
+    "check": "node --check app.js && node --check runtime/ui.js && node --check runtime/model-selection.js && node --check site.js && node --check site-actions.js && node --check read-aloud.js && node --check scripts/smoke-live.mjs && node scripts/check-network.mjs && node --test tests/*.test.mjs",
     "test": "node --test tests/*.test.mjs",
     "serve": "node scripts/serve.mjs",
     "smoke": "node scripts/smoke-live.mjs"

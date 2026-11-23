@@ -1,3 +1,4 @@
+import { createReadAloud, VOICE_SETTING_KEY } from "./read-aloud.js";
 import { App, asksToDeleteBrief, asksToSaveBrief, draftFromRequest, parseBriefText, validateBrief } from "./app.js";
 import { boot } from "./runtime/index.js";
 
@@ -246,5 +247,76 @@ async function startAssistant() {
     console.error("BriefBridge runtime failed to start", error);
   }
 }
+
+// Read aloud: the finished brief and each assistant reply.
+const voiceSelect = document.querySelector("#voice-source");
+const voiceNote = document.querySelector("#voice-note");
+const readSetting = () => { try { return localStorage.getItem(VOICE_SETTING_KEY) === "otari" ? "otari" : "browser"; } catch { return "browser"; } };
+if (voiceSelect) {
+  voiceSelect.value = readSetting();
+  voiceSelect.addEventListener("change", () => {
+    try { localStorage.setItem(VOICE_SETTING_KEY, voiceSelect.value); } catch {}
+    if (voiceNote) voiceNote.textContent = "";
+  });
+}
+const reader = createReadAloud({
+  getSetting: readSetting,
+  // The visitor's own applied setup for this tab; it is only sent to that router.
+  getOtari: () => {
+    try {
+      return { key: sessionStorage.getItem("nsweb-byok-tab-key") || "", router: sessionStorage.getItem("nsweb-byok-router") || "" };
+    } catch { return null; }
+  },
+  onNote: text => { if (voiceNote) voiceNote.textContent = text; },
+  onChange: owner => {
+    document.querySelectorAll("[data-read-aloud]").forEach(button => {
+      const on = button === owner;
+      button.textContent = on ? "Stop" : "Read aloud";
+      button.setAttribute("aria-pressed", String(on));
+    });
+  },
+});
+const toggleRead = (button, textFor) => {
+  if (reader.owner === button) { reader.stop(); return; }
+  if (voiceNote) voiceNote.textContent = "";
+  reader.read(textFor(), button);
+};
+const briefButton = document.querySelector("#read-brief");
+if (briefButton) {
+  briefButton.dataset.readAloud = "brief";
+  briefButton.addEventListener("click", () => toggleRead(briefButton, () => {
+    const preview = document.querySelector("#brief-preview");
+    return [preview?.querySelector("h3")?.textContent, preview?.querySelector("pre")?.textContent].filter(Boolean).join(".\n");
+  }));
+}
+function addReplyButton(bubble) {
+  if (!bubble.classList.contains("bot") || bubble.classList.contains("ns-turn-status") || bubble.dataset.readAloudReady) return;
+  bubble.dataset.readAloudReady = "true";
+  const row = document.createElement("div");
+  row.className = "ns-read-row";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "Read aloud";
+  button.dataset.readAloud = "reply";
+  button.setAttribute("aria-pressed", "false");
+  button.setAttribute("aria-label", "Read this reply aloud");
+  button.addEventListener("click", () => toggleRead(button, () => bubble.innerText || bubble.textContent || ""));
+  row.append(button);
+  bubble.after(row);
+}
+function watchReplies() {
+  const msgs = document.querySelector("#ns-msgs");
+  if (!msgs) return;
+  msgs.querySelectorAll(".ns-msg.bot").forEach(addReplyButton);
+  new MutationObserver(records => {
+    for (const record of records) {
+      record.addedNodes.forEach(node => {
+        if (node.nodeType === 1 && node.matches(".ns-msg.bot")) addReplyButton(node);
+      });
+    }
+  }).observe(msgs, { childList: true });
+}
+window.addEventListener("briefbridge:assistant-ready", watchReplies, { once: true });
+window.addEventListener("pagehide", () => reader.stop());
 
 startAssistant();
