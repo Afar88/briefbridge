@@ -46,7 +46,7 @@ test("section fields map to the brief form and unrelated fields stay empty", () 
     title: sample.Project, objective: sample.Goal, audience: sample.Audience,
     scope: sample.Scope, deliverables: sample.Deliverables, timeline: sample.Timeline,
     budget: sample.Budget, assumptions: sample.Assumptions, openQuestions: sample["Open questions"],
-    client: "", projectType: "", constraints: "", nextSteps: "",
+    client: "", projectType: "Web design", constraints: "", nextSteps: "",
   });
 });
 test("page handoff fills text fields without saving and removes the fragment", async () => {
