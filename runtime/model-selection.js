@@ -30,3 +30,38 @@ export function selectAutomaticChatModel(catalog, preferredIds = []) {
   }
   return [...suitable].sort((a, b) => priceScore(a) - priceScore(b) || String(a.id).localeCompare(String(b.id)))[0];
 }
+
+// IDs of the catalog models the chat selector may offer.
+// Catalogs without chat metadata (plain OpenAI-compatible lists) cannot be
+// judged, so only speech/TTS IDs are left out of them.
+const hasChatMetadata = (catalog) => catalog.some((item) => typeof item?.type === "string" || Array.isArray(item?.supported_parameters));
+export function chatModelIds(catalog) {
+  if (!Array.isArray(catalog)) return [];
+  const usable = hasChatMetadata(catalog)
+    ? catalog.filter(isSuitableChatModel)
+    : catalog.filter((item) => typeof item?.id === "string" && !NON_COMPLETION_MODEL_ID.test(item.id));
+  return usable.map((item) => item.id);
+}
+
+// Check a chosen, typed or saved model against the live catalog. A model that
+// is not a suitable chat model is replaced with the automatic pick.
+export function checkChatModel(modelId, catalog, preferredIds = []) {
+  if (!modelId || !Array.isArray(catalog) || !catalog.length) return { ok: true, model: modelId };
+  if (chatModelIds(catalog).includes(modelId)) return { ok: true, model: modelId };
+  const pick = selectAutomaticChatModel(catalog, preferredIds);
+  const published = catalog.some((item) => item?.id === modelId);
+  const lead = published ? "Not a chat model." : "Model not found.";
+  return {
+    ok: false,
+    model: pick?.id || "",
+    note: pick ? `${lead} Picked ${pick.id}. Press Save and start.` : `${lead} Pick another model.`,
+  };
+}
+
+// Turn the router's raw 402 pricing_required error into a plain message.
+const PRICING_REQUIRED = /LLM HTTP 402\b[\s\S]*pricing_required|LLM HTTP 402\b[\s\S]*priced per character/i;
+export const PRICING_REQUIRED_MESSAGE = "This model can't be used for chat. Pick another model.";
+export function friendlyModelError(message) {
+  const text = String(message ?? "");
+  return PRICING_REQUIRED.test(text) ? PRICING_REQUIRED_MESSAGE : text;
+}

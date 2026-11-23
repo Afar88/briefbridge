@@ -137,6 +137,9 @@ if (runtimeUi.includes("alibaba/qwen3.8-flash")) fail("The Otari preset must not
 if (!runtimeUi.includes("selectAutomaticChatModel")) fail("Save and start must pick a published chat model from the live router list.");
 const modelSelection = await readFile(resolve(root, "runtime/model-selection.js"), "utf8");
 if (!modelSelection.includes("NON_COMPLETION_MODEL_ID")) fail("Model selection must keep rejecting TTS and other non-chat models.");
+if (!runtimeUi.includes("chatModelIds(catalog)")) fail("The Available models list must offer only suitable chat models.");
+if (!runtimeUi.includes("checkChatModel(")) fail("Save and start and saved setups must reject non-chat models.");
+if (!runtimeUi.includes("friendlyModelError(")) fail("A 402 pricing_required error must show a plain message.");
 if (manifest.llm_router?.mock !== false) fail("The public network must not run in mock mode.");
 if (manifest.deployment?.mode !== "static") fail("The deployment mode must be static.");
 if (!manifest.actions?.module || !manifest.actions?.bridge) fail("The action module and bridge must be declared.");
