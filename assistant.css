@@ -5,6 +5,7 @@
 #agent-app input:not([type=checkbox]):not([type=radio]):not([type=file]),#agent-app select{min-height:44px}
 #agent-app input,#agent-app textarea,#agent-app select{background:#0f1929;color:#f3f6fa;border-color:rgba(196,211,231,.28);font-size:16px}
 #agent-app input[type=checkbox],#agent-app input[type=radio]{width:auto}
+#agent-app .ns-inputbar .ns-input{min-height:44px;padding:10px 12px;font-size:16px;line-height:1.45}
 #agent-app .ns-header{border:1px solid var(--ns-border);border-radius:12px;flex-wrap:wrap;background:#172337}
 #agent-app .ns-chat{background:var(--ns-bg);border:1px solid var(--ns-border);border-radius:16px;overflow:hidden;width:100%;min-width:0}
 #agent-app .ns-agents,#agent-app .ns-dev{border:1px solid var(--ns-border);border-radius:16px;background:#172337}

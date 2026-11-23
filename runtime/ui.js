@@ -198,7 +198,7 @@ fieldset.ns-w-row{min-width:0;margin:0;padding:0;border:0}
 .ns-turn-status-spinner{width:12px;height:12px;flex:0 0 12px;border:2px solid var(--ns-primary,#2563eb);border-top-color:transparent;border-radius:50%;animation:ns-spin .8s linear infinite}
 .ns-turn-status-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
 .ns-inputbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-top:1px solid var(--ns-border,#e2e2e2)}
-.ns-inputbar input{flex:1 1 220px;min-width:0;padding:8px 10px;border:1px solid var(--ns-border,#ccc);border-radius:8px;font-size:14px}
+.ns-inputbar .ns-input{flex:1 1 220px;min-width:0;padding:8px 10px;border:1px solid var(--ns-border,#ccc);border-radius:8px;font:inherit;font-size:14px;line-height:1.45;resize:none;overflow-y:auto;max-height:9.5em;white-space:pre-wrap;overflow-wrap:anywhere}
 .ns-inputbar button{padding:8px 16px;background:var(--ns-primary,#2563eb);color:#fff;border:0;border-radius:8px;cursor:pointer;font-weight:600}
 .ns-inputbar button:disabled{opacity:.5;cursor:default}
 .ns-inputbar[data-turn-active="true"]{border-top-color:color-mix(in srgb,var(--ns-primary,#2563eb) 45%,var(--ns-border,#e2e2e2))}
@@ -355,7 +355,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       </div>
       ${settingsSlot ? "" : settingsHtml}
       <div class="ns-inputbar" data-turn-active="false">
-        <input id="ns-input" class="ns-input" placeholder="Type a request…" />
+        <textarea id="ns-input" class="ns-input" rows="1" placeholder="Type a request…" aria-label="Message the assistant"></textarea>
         <button id="ns-send" class="ns-send">Send</button>
         <button id="ns-newchat" title="Clear conversation history" style="background:transparent;color:var(--ns-muted,#888);border:1px solid var(--ns-border,#ccc)">New chat</button>
       </div>
@@ -435,6 +435,10 @@ export function mountApp(root, { engine, trace, manifest }) {
   const input = root.querySelector("#ns-input");
   const sendBtn = root.querySelector("#ns-send");
   const inputBar = root.querySelector(".ns-inputbar");
+  function fitInput() {
+    input.style.height = "auto";
+    if (input.value) input.style.height = `${input.scrollHeight + 2}px`;
+  }
   const newChatBtn = root.querySelector("#ns-newchat");
   const countEl = root.querySelector("#ns-count");
   const breadcrumb = root.querySelector("#ns-breadcrumb");
@@ -570,6 +574,7 @@ export function mountApp(root, { engine, trace, manifest }) {
     if (!text || activeTurnStream) return false;
     if (!await validateConfiguredModel()) return false;
     input.value = "";
+    fitInput();
     addBubble(msgs, "user", text);
     currentBot = null;
     const stream = engine.streamTurn(text, { interaction, slyData: { backend_token: "demo-customer-token-123" } });
@@ -608,6 +613,7 @@ export function mountApp(root, { engine, trace, manifest }) {
     if (activeTurnStream) {
       if (!activeTurnStream.steer?.(text)) return false;
       input.value = "";
+      fitInput();
       const bubble = addBubble(msgs, "user", text);
       bubble.classList.add("ns-steering-message");
       bubble.dataset.inputKind = "steering";
@@ -618,9 +624,12 @@ export function mountApp(root, { engine, trace, manifest }) {
   };
 
   sendBtn.addEventListener("click", send);
+  // The chat box grows with its text (up to its max height); Enter sends,
+  // Shift+Enter adds a new line.
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") send();
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); }
   });
+  input.addEventListener("input", fitInput);
   newChatBtn.addEventListener("click", () => {
     engine.resetHistory();
     currentBot = null;
