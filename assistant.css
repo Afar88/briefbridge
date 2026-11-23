@@ -9,12 +9,12 @@
 #agent-app .ns-chat{background:var(--ns-bg);border:1px solid var(--ns-border);border-radius:16px;overflow:hidden}
 #agent-app .ns-agents,#agent-app .ns-dev{border:1px solid var(--ns-border);border-radius:16px;background:#172337}
 #agent-app .ns-msg{overflow-wrap:anywhere;word-break:break-word;font-size:16px;line-height:1.55}
-#agent-app .ns-inputbar button,#agent-app .ns-settings-body button,#agent-app .ns-w-btn,#agent-app .ns-devtoggle{min-height:44px;padding:0 var(--s3);font-weight:700;border-radius:10px}
+#agent-app .ns-inputbar button,#agent-app .ns-settings-body button,#agent-app .ns-w-btn,#agent-app .ns-devtoggle{padding:0 var(--s3);font-weight:700;border-radius:10px}
 #agent-app .ns-inputbar button,#agent-app .ns-settings-body button:not(.ghost){color:#14200f}
-#agent-app button.ns-modal-close{min-width:44px;min-height:44px}
+#agent-app button.ns-modal-close{min-width:44px}
 #agent-app .ns-w-choice{background:#22344e;color:#f3f6fa;border-color:var(--ns-border);white-space:normal;overflow-wrap:anywhere}
 #agent-app .ns-settings-body label,#agent-app .ns-widget label{margin:var(--s1) 0;font-weight:600;color:#c9d3e0}
-#agent-app .ns-settings-body input,#agent-app .ns-settings-body select{min-height:44px;padding:var(--s2) var(--s3);font-size:16px;border-radius:10px}
+#agent-app .ns-settings-body input,#agent-app .ns-settings-body select{padding:var(--s2) var(--s3);font-size:16px;border-radius:10px}
 #agent-app .ns-consent{background:#1c2b42;color:#f3f6fa;border:1px solid #c5f36b66}
 #agent-app .ns-consent-actions{flex-wrap:wrap}
 #agent-app .ns-consent-actions button{white-space:nowrap}
@@ -31,7 +31,7 @@
 .assistant-panels{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:var(--s3);min-width:0}
 #agent-app.ns-composed-app [data-ns-slot=chat]{height:620px}
 #agent-app .ns-read-row{align-self:flex-start;margin:0 0 var(--s1)}
-#agent-app .ns-read-row button{min-height:44px;min-width:44px;padding:0 var(--s3);border-radius:10px;border:1px solid rgba(196,211,231,.28);background:transparent;color:#c9d3e0;font-size:14px;font-weight:700;cursor:pointer}
+#agent-app .ns-read-row button{min-width:44px;padding:0 var(--s3);border-radius:10px;border:1px solid rgba(196,211,231,.28);background:transparent;color:#c9d3e0;font-size:14px;font-weight:700;cursor:pointer}
 #agent-app .ns-read-row button[aria-pressed="true"]{border-color:#c5f36b;color:#c5f36b}
 
 /* Save and delete review dialog, in the site palette. */
@@ -43,7 +43,7 @@ body>dialog h2{margin:0 0 var(--s3);font:800 20px Manrope,"DM Sans",sans-serif}
 .assistant-review dt{font-weight:700;color:#c5f36b}
 .assistant-review dd{margin:0;overflow-wrap:anywhere}
 .assistant-review pre{white-space:pre-wrap;overflow-wrap:anywhere}
-.assistant-review button{min-height:44px;padding:0 var(--s3);border-radius:10px;border:1px solid transparent;background:#c5f36b;color:#14200f;font-weight:700;margin-right:var(--s2)}
+.assistant-review button{padding:0 var(--s3);border-radius:10px;border:1px solid transparent;background:#c5f36b;color:#14200f;font-weight:700;margin-right:var(--s2)}
 .assistant-review .assistant-decline{background:transparent;color:#f3f6fa;border-color:rgba(196,211,231,.4)}
 
 @media(max-width:760px){
@@ -62,5 +62,4 @@ body>dialog h2{margin:0 0 var(--s3);font:800 20px Manrope,"DM Sans",sans-serif}
 #agent-app .ns-key-providers a{background:transparent}
 #agent-app .ns-anode{background:#22344e;color:#f3f6fa;border:1px solid var(--ns-border);border-radius:10px;max-width:100%;overflow-wrap:anywhere}
 #agent-app .ns-key-help{background:#14213a}
-#agent-app summary{display:flex;align-items:center;min-height:44px;cursor:pointer}
-#agent-app .ns-key-help>a{display:inline-flex;align-items:center;min-height:44px}
+#agent-app summary{display:flex;align-items:center;cursor:pointer}

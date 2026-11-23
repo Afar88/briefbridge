@@ -164,6 +164,5 @@ h1 em,.section-title em{font-style:normal;color:var(--lime)}
   .secondary-actions .button{flex:1 1 calc(50% - var(--s2));padding:0 var(--s2)}
   .section-head .button{align-self:stretch}
 }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
-.secondary-actions .button{white-space:nowrap}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}} 
 
