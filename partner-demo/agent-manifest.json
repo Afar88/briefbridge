@@ -1,0 +1,72 @@
+{
+  "brand": "ShopStart — Website Starter",
+  "networks": [
+    {
+      "name": "shopstart_network",
+      "front_man": "shopstart_coordinator",
+      "hocon": "./shopstart_network.network.json",
+      "description": "Help small business owners start a website by asking BriefBridge for a project brief.",
+      "tags": [
+        "open-agentic-website",
+        "website-intake",
+        "small-business",
+        "briefbridge"
+      ],
+      "sample_queries": [
+        "I need a website for my salon in Benin City.",
+        "Help me plan a simple shop website.",
+        "I want a website for my catering business."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.otari.ai/api/v1",
+    "mock": false,
+    "byok_router": "https://api.otari.ai/api/v1"
+  },
+  "allowed_peers": [
+    "https://briefbridge-bpxd.onrender.com"
+  ],
+  "peer_policy": {
+    "mode": "closed",
+    "deny_origins": [],
+    "note": "ShopStart contacts only BriefBridge after the visitor approves the partner card."
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "shopstart_network",
+        "front_man": "shopstart_coordinator",
+        "aliases": [
+          "shopstart_network",
+          "shopstart_coordinator",
+          "ShopStart"
+        ],
+        "url": "shopstart_network"
+      }
+    ],
+    "imports": [],
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "shopstart_network",
+    "front_man": "shopstart_coordinator",
+    "available": false,
+    "reason": "ShopStart is a static site. Its network runs in the visitor's browser and no MCP server is hosted."
+  },
+  "theme": {
+    "primary": "#c5f36b"
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  }
+}

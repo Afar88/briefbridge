@@ -1,0 +1,19 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "shopstart_network",
+      "front_man": "shopstart_coordinator",
+      "aliases": [
+        "shopstart_network",
+        "shopstart_coordinator",
+        "ShopStart"
+      ],
+      "url": "shopstart_network"
+    }
+  ],
+  "imports": [],
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}
