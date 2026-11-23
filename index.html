@@ -13,123 +13,138 @@
   <script type="module" src="./site.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#workspace">Skip to the brief builder</a>
   <header class="topbar">
-    <a class="brand" href="#" aria-label="BriefBridge home"><span class="brand-mark">B</span><span>briefbridge</span></a>
-    <nav aria-label="Main navigation">
-      <a href="#workspace">Workspace</a>
-      <a href="#assistant">AI assistant</a>
-      <a href="#saved-library">Saved briefs</a>
-    </nav>
-    <a class="topbar-cta" href="#workspace">Create a brief <span aria-hidden="true">↗</span></a>
+    <div class="container topbar-inner">
+      <a class="brand" href="#top" aria-label="BriefBridge home"><span class="brand-mark" aria-hidden="true">B</span><span>BriefBridge</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#assistant">AI assistant</a>
+        <a href="#workspace">Brief builder</a>
+        <a href="#saved-library">Saved</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <section class="hero">
+  <main id="top">
+    <section class="hero container">
       <div class="hero-copy">
-        <div class="eyebrow"><span class="pulse-dot"></span> THE PROJECT INTAKE WORKSPACE</div>
-        <h1>Good work starts with <em>clear briefs.</em></h1>
-        <p class="hero-lede">Turn scattered ideas, voice notes and client requests into a project brief everyone can understand, review and act on.</p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#workspace">Build your first brief <span aria-hidden="true">→</span></a>
-          <a class="button button-quiet" href="#assistant">Talk to the assistant</a>
+        <p class="eyebrow">Project intake workspace</p>
+        <h1>Turn a rough idea into a <em>clear brief.</em></h1>
+        <p class="lede">Describe your project in plain words. BriefBridge shapes it into a brief your team or client can review, save and share.</p>
+        <div class="actions">
+          <a class="button button-primary" href="#assistant">Start with AI</a>
+          <a class="button button-outline" href="#workspace">Fill it in myself</a>
         </div>
-        <div class="hero-proof"><span class="proof-avatars"><i>A</i><i>B</i><i>C</i></span><span>One clear starting point for clients, creatives and teams.</span></div>
+        <p class="hero-note">The brief builder works without an AI key.</p>
       </div>
-      <div class="hero-visual" aria-label="Preview of a structured project brief">
-        <div class="visual-top"><span><b></b><b></b><b></b></span><small>BRIEF / 001</small><span class="visual-tag">IN PROGRESS</span></div>
-        <div class="visual-content">
-          <div class="visual-kicker">PROJECT OVERVIEW</div>
-          <h2>Make the idea<br>make sense.</h2>
-          <p>A shared understanding of what needs to happen, who it is for and what success looks like.</p>
-          <div class="visual-rule"></div>
-          <div class="visual-grid">
-            <div><small>OBJECTIVE</small><strong>One clear goal</strong></div>
-            <div><small>DELIVERABLES</small><strong>Defined outputs</strong></div>
-            <div><small>PEOPLE</small><strong>Shared context</strong></div>
-            <div><small>NEXT STEP</small><strong>Ready to move</strong></div>
+      <div class="hero-card" aria-hidden="true">
+        <div class="hero-card-top"><span>Brief 001</span><span class="tag">Ready</span></div>
+        <h2>Bakery logo and website</h2>
+        <dl>
+          <div><dt>Objective</dt><dd>Launch a simple online presence</dd></div>
+          <div><dt>Deliverables</dt><dd>Logo, one-page website</dd></div>
+          <div><dt>Timeline</dt><dd>3 weeks</dd></div>
+          <div><dt>Budget</dt><dd>About $300</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="steps container" id="how-it-works" aria-labelledby="steps-heading">
+      <h2 id="steps-heading" class="section-title">How it works</h2>
+      <ol class="step-list">
+        <li><span class="step-num">1</span><div><strong>Connect your AI key</strong><p>Optional. Paste your Otari key once.</p></div></li>
+        <li><span class="step-num">2</span><div><strong>Describe your project</strong><p>Chat with the assistant, or type the details.</p></div></li>
+        <li><span class="step-num">3</span><div><strong>Review and save</strong><p>Check the brief, save it, export or read it aloud.</p></div></li>
+      </ol>
+    </section>
+
+    <section id="assistant" class="band" aria-labelledby="assistant-heading">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">AI assistant</p>
+            <h2 id="assistant-heading" class="section-title">Have a rough idea? Let's shape it.</h2>
+            <p class="section-lede">The assistant asks what's missing, fills the brief form, and only saves after you approve.</p>
           </div>
         </div>
-        <div class="visual-foot"><span>BRIEFBRIDGE WORKSPACE</span><span>01 — 04</span></div>
-        <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
+        <p id="assistant-status" class="status-line" role="status">Loading the assistant… The brief builder still works if it's unavailable.</p>
+        <div class="assistant-shell">
+          <div id="agent-app">
+            <div data-ns-slot="header"></div>
+            <details class="assistant-settings">
+              <summary><span class="step-num">1</span> Connect your AI key</summary>
+              <p class="settings-tip">Paste your key here, never in the chat. Use a key with a small spending limit.</p>
+              <div data-ns-slot="settings"></div>
+            </details>
+            <div class="assistant-panels"><div data-ns-slot="chat"></div><div data-ns-slot="agents"></div></div>
+          </div>
+        </div>
+        <p class="fine-print">Your messages go to the AI provider you choose. Your key stays in this browser. Delete your setup before sharing this device.</p>
       </div>
     </section>
 
-    <section class="value-strip" id="how-it-works">
-      <div><span class="value-number">01</span><strong>Understand the request</strong><p>Bring the rough idea. Clarify what is missing.</p></div>
-      <div><span class="value-number">02</span><strong>Shape the scope</strong><p>Turn expectations into tangible deliverables.</p></div>
-      <div><span class="value-number">03</span><strong>Move with confidence</strong><p>Save, share and take the next step.</p></div>
-    </section>
-
-    <section class="workspace-section" id="workspace">
-      <div class="section-heading">
-        <div><div class="eyebrow">YOUR WORKSPACE</div><h2>What would you like to do?</h2><p>Start with a rough idea or build a structured brief yourself. You can switch paths whenever you need.</p></div>
-        <button class="text-button" id="fill-example" type="button">Load a sample brief <span>↗</span></button>
+    <section class="container section" id="workspace" aria-labelledby="workspace-heading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Brief builder</p>
+          <h2 id="workspace-heading" class="section-title">Your project brief</h2>
+          <p class="section-lede">Fill it in yourself, or let the assistant fill it. Required fields are marked *.</p>
+        </div>
+        <button class="button button-outline" id="fill-example" type="button">Load a sample</button>
       </div>
 
-      <div class="workspace-start" aria-label="Choose how to create a brief">
-        <a class="start-card start-card-primary" href="#brief-form">
-          <span class="start-card-icon" aria-hidden="true">✳</span>
-          <span class="start-card-copy"><strong>Build a brief manually</strong><small>Fill in the details at your own pace. No AI key required.</small></span>
-          <span class="start-card-arrow" aria-hidden="true">→</span>
-        </a>
-        <a class="start-card" href="#assistant">
-          <span class="start-card-icon" aria-hidden="true">✦</span>
-          <span class="start-card-copy"><strong>Start with AI</strong><small>Describe your idea and let BriefBridge help shape the brief.</small></span>
-          <span class="start-card-arrow" aria-hidden="true">→</span>
-        </a>
-      </div>
       <div class="workspace-grid">
-        <section class="builder-panel">
-          <div class="panel-heading"><div><span class="panel-index">01 / INTAKE</span><h3>Project details</h3></div><span class="panel-state">Autosaves in this browser</span></div>
+        <section class="card builder-panel" aria-labelledby="details-heading">
+          <div class="card-head"><h3 id="details-heading">Project details</h3><span class="pill">Autosaves here</span></div>
           <form id="brief-form">
             <div class="form-row">
-              <label class="field field-wide"><span>Project title <b>*</b></span><input name="title" maxlength="120" placeholder="e.g. Brand launch campaign" required></label>
-              <label class="field"><span>Client / organisation</span><input name="client" maxlength="120" placeholder="Who is this for?"></label>
+              <label class="field"><span>Project title <b>*</b></span><input name="title" maxlength="120" placeholder="e.g. Brand launch campaign" required></label>
+              <label class="field"><span>Client or organisation</span><input name="client" maxlength="120" placeholder="Who is this for?"></label>
             </div>
-            <div class="form-row">
-              <label class="field"><span>Project type</span><select name="projectType"><option>Marketing</option><option>Branding</option><option>Web design</option><option>Software / product</option><option>Content creation</option><option>Event</option><option>Research</option><option>Other</option></select></label>
-            </div>
-            <label class="field"><span>What is the main objective? <b>*</b></span><textarea name="objective" rows="3" maxlength="1600" placeholder="What should this project achieve?" required></textarea></label>
-            <label class="field"><span>Who is the target audience? <b>*</b></span><textarea name="audience" rows="2" maxlength="800" placeholder="Describe the people this work is for." required></textarea></label>
-            <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One deliverable per line" required></textarea><small>Be specific about what will be handed over.</small></label>
+            <label class="field field-half"><span>Project type</span><select name="projectType"><option>Marketing</option><option>Branding</option><option>Web design</option><option>Software / product</option><option>Content creation</option><option>Event</option><option>Research</option><option>Other</option></select></label>
+            <label class="field"><span>Main objective <b>*</b></span><textarea name="objective" rows="3" maxlength="1600" placeholder="What should this project achieve?" required></textarea></label>
+            <label class="field"><span>Target audience <b>*</b></span><textarea name="audience" rows="2" maxlength="800" placeholder="Who is this work for?" required></textarea></label>
+            <label class="field"><span>Deliverables <b>*</b></span><textarea name="deliverables" rows="4" placeholder="One per line" required></textarea><small>List exactly what will be handed over.</small></label>
             <details class="optional-fields">
-              <summary>Additional details <span>Optional · scope, timeline, budget and requirements</span></summary>
+              <summary>More details <span>Optional</span></summary>
               <div class="optional-fields-content">
-                <label class="field"><span>What is included in the scope?</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Add background, boundaries or important context."></textarea></label>
+                <label class="field"><span>Scope</span><textarea name="scope" rows="2" maxlength="1600" placeholder="Background, limits or context"></textarea></label>
                 <div class="form-row">
                   <label class="field"><span>Timeline</span><input name="timeline" maxlength="240" placeholder="e.g. 3 weeks from kickoff"></label>
                   <label class="field"><span>Budget</span><input name="budget" maxlength="160" placeholder="e.g. To be agreed"></label>
                 </div>
-                <label class="field"><span>Constraints / requirements</span><textarea name="constraints" rows="3" placeholder="One requirement per line"></textarea><small>Include dependencies, preferences or things to avoid.</small></label>
+                <label class="field"><span>Requirements</span><textarea name="constraints" rows="3" placeholder="One per line"></textarea><small>Include anything to avoid.</small></label>
                 <div class="form-row">
-                  <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One assumption per line"></textarea></label>
+                  <label class="field"><span>Assumptions</span><textarea name="assumptions" rows="3" placeholder="One per line"></textarea></label>
                   <label class="field"><span>Open questions</span><textarea name="openQuestions" rows="3" placeholder="What still needs an answer?"></textarea></label>
                 </div>
-                <label class="field"><span>Suggested next steps</span><textarea name="nextSteps" rows="2" placeholder="One next step per line"></textarea></label>
+                <label class="field"><span>Next steps</span><textarea name="nextSteps" rows="2" placeholder="One per line"></textarea></label>
               </div>
             </details>
             <div class="form-actions">
-              <button class="button button-primary" type="submit">Save project brief <span>→</span></button>
-              <button class="button button-outline" id="export-markdown" type="button" disabled>Export Markdown</button>
-              <button class="button button-outline" id="export-json" type="button" disabled>Export JSON</button>
-              <button class="button button-outline" id="import-json" type="button">Import JSON</button>
-              <input id="import-json-file" type="file" accept=".json,application/json" hidden>
-              <button class="button button-quiet" id="reset-form" type="button">Clear draft</button>
+              <button class="button button-primary" type="submit">Save brief</button>
+              <div class="secondary-actions">
+                <button class="button button-outline" id="export-markdown" type="button" disabled>Export Markdown</button>
+                <button class="button button-outline" id="export-json" type="button" disabled>Export JSON</button>
+                <button class="button button-outline" id="import-json" type="button">Import JSON</button>
+                <input id="import-json-file" type="file" accept=".json,application/json" hidden>
+                <button class="button button-quiet" id="reset-form" type="button">Clear</button>
+              </div>
             </div>
             <p class="notice" id="form-notice" role="status" aria-live="polite"></p>
           </form>
         </section>
 
         <aside class="side-column">
-          <section class="preview-panel" id="brief-preview">
-            <div class="preview-top"><span class="panel-index">02 / PREVIEW</span><span class="preview-symbol">✳</span></div>
+          <section class="card preview-panel" id="brief-preview" aria-label="Brief preview">
             <h3>Your project brief</h3>
-            <p class="preview-status">Add the required details to prepare your brief.</p>
+            <p class="preview-status">Add the required details to see your brief.</p>
             <pre># Your project brief
 
-Your structured brief will appear here as you fill in the form.</pre>
+Your brief appears here as you type.</pre>
           </section>
-          <div class="read-aloud-bar">
+          <div class="card read-aloud-bar">
             <button class="button button-outline read-aloud" id="read-brief" type="button" aria-pressed="false">Read aloud</button>
             <label class="voice-setting"><span>Voice</span>
               <select id="voice-source">
@@ -139,54 +154,22 @@ Your structured brief will appear here as you fill in the form.</pre>
             </label>
             <p class="voice-note" id="voice-note" role="status" aria-live="polite"></p>
           </div>
-          <section class="saved-panel" id="saved-library" aria-labelledby="saved-library-heading">
-            <div class="saved-heading"><div><span class="panel-index">03 / LIBRARY</span><h3 id="saved-library-heading">Saved briefs</h3></div><span class="saved-count" id="saved-count">00</span></div>
-            <div id="saved-briefs" class="saved-list"><p class="empty-state">Your saved briefs will appear here.</p></div>
-            <p class="saved-footnote">Saved locally in this browser. Export a copy to share or back it up.</p>
+          <section class="card saved-panel" id="saved-library" aria-labelledby="saved-library-heading">
+            <div class="card-head"><h3 id="saved-library-heading">Saved briefs</h3><span class="pill" id="saved-count">00</span></div>
+            <div id="saved-briefs" class="saved-list"><p class="empty-state">No saved briefs yet.</p></div>
+            <p class="fine-print">Saved in this browser only. Export to back up.</p>
           </section>
-          <div class="privacy-note"><span>↗</span><p><strong>Your work stays yours.</strong><br>Briefs are stored in this browser unless you choose to send their context to your selected AI provider.</p></div>
         </aside>
       </div>
     </section>
-
-    <section id="assistant" class="assistant-section" aria-labelledby="assistant-heading">
-      <div class="assistant-intro">
-        <div class="eyebrow">YOUR AI COLLABORATOR</div>
-        <h2 id="assistant-heading">Have a rough idea?<br><em>Let's make it actionable.</em></h2>
-        <p>Tell the BriefBridge agents what you're trying to do. They'll help clarify the request, shape the scope and prepare a brief you can review and save.</p>
-        <ul><li>Ask follow-up questions when details are missing</li><li>Separate confirmed facts from assumptions</li><li>Save a finished brief only after you approve it</li></ul>
-        <p class="assistant-note">Your messages and any page data the assistant reads are sent to the AI provider you select. Your API key is saved in this browser’s local storage and sent only to the provider endpoint you configure. Use a private device and a key with a small spending limit; remove your saved setup before sharing the device. The manual brief builder works without an API key.</p>
-        <p id="assistant-status" role="status">Loading the browser agent runtime… You can still use the brief builder if the assistant is unavailable.</p>
-      </div>
-      <div class="assistant-main">
-        <div class="assistant-guide" aria-label="How to start using the AI assistant">
-        <p class="assistant-guide-title">Start here — 3 simple steps</p>
-        <ol>
-          <li><strong>Connect your AI key:</strong> open the “Connect your AI provider” panel below and paste your Otari API key.</li>
-          <li><strong>Save and start:</strong> press the “Save and start” button inside that panel.</li>
-          <li><strong>Send a request:</strong> type what you want help with in the message box and press “Send”.</li>
-        </ol>
-        <p>Your API key is private. Enter it only in the password field on this page — never in the chat.</p>
-      </div>
-      <div class="assistant-shell">
-        <div id="agent-app">
-          <div data-ns-slot="header"></div>
-          <div class="assistant-panels"><div data-ns-slot="chat"></div><div data-ns-slot="agents"></div></div>
-          <details class="assistant-settings">
-            <summary>Step 1: Connect your AI provider (API key)</summary>
-            <div data-ns-slot="settings"></div>
-          </details>
-        </div>
-      </div>
-      </div>
-    </section>
-
-    <section class="closing-cta">
-      <div><span class="eyebrow">LESS GUESSWORK. BETTER WORK.</span><h2>Start with what you know.<br><em>Build from there.</em></h2></div>
-      <a class="button button-primary" href="#workspace">Create a project brief <span>→</span></a>
-    </section>
   </main>
 
-  <footer class="footer"><a class="brand" href="#"><span class="brand-mark">B</span><span>briefbridge</span></a><p>Clarity before the work begins.</p><span>Open agentic website · Powered by Mozilla Otari</span></footer>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">B</span><span>BriefBridge</span></a>
+      <p>Clarity before the work begins.</p>
+      <p>Open agentic website · Powered by Mozilla Otari</p>
+    </div>
+  </footer>
 </body>
 </html>
