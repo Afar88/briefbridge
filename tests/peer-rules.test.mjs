@@ -32,7 +32,7 @@ test("peer coordinator returns a brief without page actions", () => {
 
   assert.match(peerRules, /Provisional outline/, "specialist failures need a labelled fallback");
   assert.match(peerRules, /Do not ask for names, emails, phone numbers or confidential details that are not needed\./);
-  assert.match(peerRules, /Do not give quotes, contracts, payment services or bookings\./);
+  assert.match(peerRules, /Do not provide quotes, contracts, payments or bookings\\./);
 
   const closingLine = "To review and save this brief, open BriefBridge at https://briefbridge-bpxd.onrender.com";
   assert.equal(peerRules.trim().split("\n").at(-1), closingLine);
