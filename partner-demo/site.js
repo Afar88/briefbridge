@@ -1,14 +1,10 @@
 import { boot } from "./runtime/index.js";
+import { isStructuredBrief } from "./partner-result.js";
 
 const status = document.querySelector("#assistant-status");
 const resultPanel = document.querySelector("#partner-result");
 const resultNote = document.querySelector("#partner-result-note");
 const resultText = document.querySelector("#partner-result-text");
-
-function isStructuredBrief(text) {
-  const labels = ["objective", "audience", "deliverables"];
-  return labels.every(label => new RegExp(`(^|\\n)\\s*(?:#{1,3}\\s*)?${label}\\s*[:—-]`, "i").test(text));
-}
 
 function showPartnerReply(value) {
   const text = typeof value === "string"
