@@ -2,7 +2,8 @@ services:
   - type: web
     name: shopstart
     runtime: static
-    branch: feat/partner-demo
+    branch: main
+    rootDir: partner-demo
     autoDeploy: true
     buildCommand: npm run check
     staticPublishPath: .
@@ -11,6 +12,9 @@ services:
         name: X-Content-Type-Options
         value: nosniff
       - path: /agent-manifest.json
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /shopstart_network
         name: Access-Control-Allow-Origin
         value: "*"
       - path: /shopstart_network.network.json
