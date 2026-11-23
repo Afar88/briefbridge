@@ -9,12 +9,13 @@ const readJson = async path => JSON.parse(await readFile(resolve(root, path), "u
 const origin = "https://briefbridge-bpxd.onrender.com";
 const peerUrl = `${origin}/briefbridge_network`;
 
-const [manifest, networkJson, links, linkWellKnown, agentWellKnown] = await Promise.all([
+const [manifest, networkJson, links, linkWellKnown, agentWellKnown, packageJson] = await Promise.all([
   readJson("agent-manifest.json"),
   readJson("shopstart_network.network.json"),
   readJson("links.json"),
   readJson(".well-known/nsdeploy.json"),
-  readJson(".well-known/nsdeploy-agent.json")
+  readJson(".well-known/nsdeploy-agent.json"),
+  readJson("package.json")
 ]);
 
 const entry = manifest.networks?.find(item => item.name === "shopstart_network");
@@ -44,6 +45,8 @@ assert.equal(linkWellKnown.exports?.[0]?.network, "shopstart_network");
 assert.equal(linkWellKnown.exports?.[0]?.front_man, "shopstart_coordinator");
 assert.equal(agentWellKnown.protocol, "nsdeploy-agent-mcp/v1");
 assert.equal(agentWellKnown.available, false);
+assert.equal(packageJson.type, "module");
+assert.equal(packageJson.scripts?.check, "node --check ./site.js && node ./scripts/check-json.mjs");
 
 const render = await readFile(resolve(root, "render.yaml"), "utf8");
 for (const path of [
@@ -57,6 +60,7 @@ for (const path of [
 }
 assert.ok(render.includes("Access-Control-Allow-Origin"));
 assert.ok(render.includes("value: \"*\""));
+assert.ok(/source: \/shopstart_network[\\s\\S]*?destination: \/shopstart_network\\.network\\.json/.test(render), "Render must rewrite the public network URL");
 
 console.log("ShopStart JSON and network checks passed.");
 console.log("Network: shopstart_network; front agent: shopstart_coordinator.");

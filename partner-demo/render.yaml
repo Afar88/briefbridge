@@ -2,6 +2,8 @@ services:
   - type: web
     name: shopstart
     runtime: static
+    branch: feat/partner-demo
+    autoDeploy: true
     buildCommand: npm run check
     staticPublishPath: .
     headers:
@@ -26,3 +28,7 @@ services:
       - path: /runtime/sandbox-worker.js
         name: Content-Security-Policy
         value: "default-src 'none'; script-src blob:; connect-src 'none'; worker-src 'none'"
+    routes:
+      - type: rewrite
+        source: /shopstart_network
+        destination: /shopstart_network.network.json
