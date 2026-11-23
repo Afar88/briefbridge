@@ -18,23 +18,9 @@ function applyIncomingBriefHandoff() {
     if (field) field.value = value;
   }
 
-  const preview = document.querySelector("#brief-preview");
-  if (preview) {
-    const rows = [
-      "# " + values.title, "",
-      "## Goal", values.objective, "",
-      "## Audience", values.audience, "",
-      "## Scope", values.scope, "",
-      "## Deliverables", values.deliverables, "",
-      "## Timeline", values.timeline, "",
-      "## Budget", values.budget, "",
-      "## Assumptions", values.assumptions, "",
-      "## Open questions", values.openQuestions,
-    ];
-    let pre = preview.querySelector("pre");
-    if (!pre) { pre = document.createElement("pre"); preview.append(pre); }
-    pre.textContent = rows.join("\n");
-  }
+  // Let BriefBridge's own input handler update the preview, status, export buttons
+  // and browser-local draft. This event does not add anything to Saved briefs.
+  form.dispatchEvent(new Event("input", { bubbles: true }));
 
   const notice = document.querySelector("#form-notice");
   if (notice) {
