@@ -1193,7 +1193,7 @@ export function mountApp(root, { engine, trace, manifest }) {
       addBubble(msgs, "bot", `⚠️ ${message}`);
       return false;
     }
-    if (!model) return true;
+    if (!model && !(requireActiveKey && engine.modelOverride)) return true;
     if ((key || model) && byokRouter && isMockRouter(router)) {
       router = byokRouter;
       routerEl.value = router;
@@ -1213,8 +1213,10 @@ export function mountApp(root, { engine, trace, manifest }) {
   const rejectNonChatModel = (model, inChat = false) => {
     const check = checkChatModel(model, lastCatalog, preferredModels());
     if (check.ok) return false;
-    modelEl.value = check.model;
-    modelSelectEl.value = check.model;
+    if (check.model) {
+      modelEl.value = check.model;
+      modelSelectEl.value = check.model;
+    }
     setProfileHint(check.note, "warn");
     root.querySelector(".ns-settings").open = true;
     root.querySelector(".ns-settings-advanced").open = true;
