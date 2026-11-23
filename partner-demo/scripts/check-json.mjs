@@ -89,7 +89,7 @@ assert.doesNotMatch(siteSource, /innerHTML/, "peer reply must not be rendered as
 
 assert.match(byokSource, /localStorage\.setItem\(STORE_KEY, JSON\.stringify\(normalized\)\)/);
 assert.match(byokSource, /sessionStorage\.setItem\(TAB_KEY_ITEM, setup\.key\)/);
-assert.match(byokSource, /return host === "localhost" \|\| host === "127\.0\.0\.1" \|\| host === "::1" \|\| host === "\\[::1\\]"/);
+assert.match(byokSource, /return host === "localhost" \|\| host === "127\.0\.0\.1" \|\| host === "::1" \|\| host === "\[::1\]"/);
 assert.match(byokSource, /if \(!canUseByokCookie\(\) \|\| typeof document === "undefined"\) return;/);
 assert.match(llmSource, /Authorization: `Bearer \$\{this\.apiKey\}`/, "key must be sent in an Authorization header to the chosen router");
 assert.match(llmSource, /fetch\(`\$\{this\.baseUrl\}\/chat\/completions`, \{\s*method: "POST"/);
