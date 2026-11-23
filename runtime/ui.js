@@ -1199,10 +1199,13 @@ export function mountApp(root, { engine, trace, manifest }) {
       routerEl.value = router;
       refreshHint();
     }
-    const availableModels = await fetchAvailableModels(router, key);
-    if (!availableModels) return true;
-    // On a send the engine uses the applied model, which may differ from the form.
+    // On a send the engine uses the applied setup, which may differ from an
+    // unapplied draft in the form, so check its model against its own router.
     const usedModel = requireActiveKey ? normalizeModelName(engine.modelOverride || model) : model;
+    const usedRouter = requireActiveKey ? (engine.routerOverride || engine.top?.llm?.baseUrl || router) : router;
+    const usedKey = requireActiveKey ? engine.byokKey : key;
+    const availableModels = await fetchAvailableModels(usedRouter, usedKey);
+    if (!availableModels) return true;
     return !rejectNonChatModel(usedModel, requireActiveKey);
   };
   // Replace a model that is not a suitable chat model with the automatic pick
