@@ -21,6 +21,8 @@ test("rejects embedding, unpriced and non-tool models", () => {
   assert.equal(isSuitableChatModel(chat("vendor/free", { pricing_source: "none" })), false);
   assert.equal(isSuitableChatModel(chat("vendor/no-tools", { supported_parameters: [] })), false);
   assert.equal(isSuitableChatModel(chat("vendor/no-tool-choice", { supported_parameters: ["tools"] })), false);
+  assert.equal(isSuitableChatModel(chat("alibaba/qwen3-tts")), false);
+  assert.equal(isSuitableChatModel(chat("vendor/text-to-speech")), false);
 });
 
 test("keeps a preferred model only when it passes every suitability check", () => {
@@ -38,6 +40,7 @@ test("chooses the least expensive suitable model when no preference matches", ()
 
 test("returns null when no model is demonstrably suitable", () => {
   assert.equal(selectAutomaticChatModel([chat("vendor/unknown", { type: undefined })]), null);
+  assert.equal(selectAutomaticChatModel([chat("alibaba/qwen3-tts"), chat("vendor/chat")]).id, "vendor/chat");
   assert.equal(selectAutomaticChatModel([]), null);
   assert.equal(selectAutomaticChatModel(null), null);
 });
