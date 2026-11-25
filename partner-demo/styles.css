@@ -157,7 +157,7 @@ h1, h2, .section-title, .brand { font-family: var(--font-head); }
   html { scroll-behavior: auto; }
   .sample-brief li, .handoff-step.is-active .handoff-dot { animation: none; }
 }
-/* Keep ShopStart red: no green from the shared runtime's key help */
+/* Keep ShopStart red in the shared runtime key help */
 #agent-app .ns-key-help { border-color: rgba(255, 89, 104, .45); }
 #agent-app .ns-key-help a { color: #ff8a94; }
 #agent-app .ns-key-help button, #agent-app .ns-key-providers button, #agent-app .ns-key-providers a { border-color: rgba(255, 89, 104, .6); color: #ff8a94; }
