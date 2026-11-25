@@ -30,21 +30,17 @@
         <h1 id="hero-title">Bring your business <em>online.</em></h1>
         <p class="lede">Tell us what your website must do.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#assistant">Start with AI</a>
+          <a class="button button-primary" href="#assistant">Try it</a>
           <a class="button button-outline" href="#how-it-works">See the steps</a>
         </div>
         <p class="hero-note">No web skills needed. Start with a simple plan.</p>
       </div>
-      <div class="hero-card" aria-hidden="true">
-        <div class="hero-card-top"><span>Website plan</span><span class="tag">Your next step</span></div>
-        <h2>A clear start for your business.</h2>
-        <dl>
-          <div><dt>Goal</dt><dd>Reach more customers</dd></div>
-          <div><dt>Pages</dt><dd>Plan what you need</dd></div>
-          <div><dt>Look</dt><dd>Fit your brand</dd></div>
-          <div><dt>Next</dt><dd>Review your brief</dd></div>
-        </dl>
-      </div>
+      <figure class="hero-card sample-card" id="handoff-sample" aria-label="Sample of a ShopStart to BriefBridge handoff">
+        <div class="hero-card-top"><span class="mono">ShopStart → BriefBridge</span><span class="tag">Sample</span></div>
+        <ol class="handoff-steps sample-steps" aria-hidden="true"></ol>
+        <ul class="sample-brief mono" aria-hidden="true"></ul>
+        <p class="receipt-line sample-receipt" hidden>BriefBridge · sample · not a real run</p>
+      </figure>
     </section>
     <section class="steps container" id="how-it-works" aria-labelledby="steps-heading">
       <h2 id="steps-heading" class="section-title">How it works</h2>
@@ -62,6 +58,10 @@
             <h2 id="assistant-heading" class="section-title">What should your website do?</h2>
             <p class="section-lede">Share the idea. We will help shape the plan.</p>
           </div>
+        </div>
+        <div class="handoff-bar" id="handoff-bar" hidden role="status" aria-live="polite">
+          <p class="handoff-title mono"><span class="handoff-from">ShopStart</span> → <span class="handoff-to">BriefBridge</span></p>
+          <ol class="handoff-steps" id="handoff-steps"></ol>
         </div>
         <p id="assistant-status" class="status-line" role="status">Loading ShopStart. The assistant will be ready soon.</p>
         <div class="assistant-shell">
@@ -90,6 +90,7 @@
       <h2 id="partner-result-title" class="section-title">Your BriefBridge reply</h2>
       <p class="result-note" id="partner-result-note"></p>
       <pre class="result-text" id="partner-result-text"></pre>
+      <p class="receipt-line" id="partner-receipt" hidden></p>
       <a class="button button-primary open-briefbridge" id="open-briefbridge-result"
          href="https://briefbridge-bpxd.onrender.com"
          target="_blank" rel="noopener noreferrer">Open in BriefBridge</a>
