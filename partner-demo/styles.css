@@ -7,6 +7,9 @@
   --red-ink: #26080d; --space-1: .5rem; --space-2: 1rem; --space-3: 1.5rem;
   --space-4: 2rem; --space-5: 3rem; --round: 1rem;
   --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "DM Mono", Menlo, Consolas, monospace;
+  --shadow: 0 18px 50px rgba(0, 0, 0, .28);
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; max-width: 100%; }
@@ -124,4 +127,37 @@ h2 { margin-bottom: var(--space-1); font-size: clamp(1.65rem, 5vw, 2.25rem); fon
   .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; }
   .result-topline { align-items: flex-start; flex-direction: column; }
 }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+/* Polish: rounded headings, mono for tech detail, soft cards */
+h1, h2, .section-title, .brand { font-family: var(--font-head); }
+.mono, .receipt-line, .tag, .source-label { font-family: var(--font-mono); }
+.hero-card, .step-list li, .partner-result, .assistant-shell { border-radius: 1.35rem; box-shadow: var(--shadow); }
+.step-list li { padding: var(--space-3); }
+.sample-card { margin: 0; }
+.sample-card .hero-card-top { text-transform: none; letter-spacing: 0; }
+.sample-brief { display: grid; gap: .45rem; min-height: 7.2rem; margin: var(--space-2) 0 0; padding: var(--space-2); list-style: none; border: 1px solid var(--line); border-radius: .9rem; background: var(--field); color: var(--ink-soft); font-size: .85rem; }
+.sample-brief li { animation: line-in .35s ease-out both; }
+.handoff-bar { margin-bottom: var(--space-2); padding: var(--space-2); border: 1px solid rgba(255, 89, 104, .55); border-radius: 1.1rem; background: var(--panel-raised); box-shadow: var(--shadow); }
+.handoff-title { margin: 0 0 .6rem; font-size: .9rem; font-weight: 700; color: var(--ink-soft); }
+.handoff-to { color: var(--red); }
+.handoff-steps { display: grid; gap: .45rem; margin: 0; padding: 0; list-style: none; }
+.handoff-step { display: flex; align-items: center; gap: .65rem; color: var(--muted); font-weight: 750; font-size: .95rem; }
+.handoff-dot { width: 14px; height: 14px; flex: 0 0 14px; border: 2px solid var(--line); border-radius: 50%; }
+.handoff-step.is-active { color: var(--ink); }
+.handoff-step.is-active .handoff-dot { border-color: var(--red); animation: pulse 1.4s ease-in-out infinite; }
+.handoff-step.is-done { color: var(--ink-soft); }
+.handoff-step.is-done .handoff-dot { border-color: var(--red); background: var(--red); }
+.handoff-step.is-failed { color: #ff8a94; }
+.handoff-step.is-failed .handoff-dot { border-color: #ff8a94; }
+.handoff-meta { font-family: var(--font-mono); font-size: .8rem; }
+.receipt-line { margin: 0 0 var(--space-3); padding: .55rem .8rem; border: 1px dashed var(--line); border-radius: .7rem; color: var(--muted); font-size: .82rem; overflow-wrap: anywhere; }
+.sample-receipt { margin: var(--space-2) 0 0; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(255, 89, 104, .18); } }
+@keyframes line-in { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .sample-brief li, .handoff-step.is-active .handoff-dot { animation: none; }
+}
+/* Keep ShopStart red in the shared runtime key help */
+#agent-app .ns-key-help { border-color: rgba(255, 89, 104, .45); }
+#agent-app .ns-key-help a { color: #ff8a94; }
+#agent-app .ns-key-help button, #agent-app .ns-key-providers button, #agent-app .ns-key-providers a { border-color: rgba(255, 89, 104, .6); color: #ff8a94; }
