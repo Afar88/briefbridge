@@ -166,3 +166,31 @@ h1 em,.section-title em{font-style:normal;color:var(--lime)}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}} 
 
+
+/* Sample card — labeled demo that types itself in */
+.sample-lines{display:grid;gap:var(--s2);margin-top:var(--s4);min-height:190px;align-content:start}
+.sample-line{font-size:15px;color:var(--ink-2);margin:0;opacity:0;animation:bb-sample-in .5s ease forwards}
+.sample-line.sample-title{font:800 22px/1.25 var(--display);color:var(--ink);margin-bottom:var(--s1)}
+.sample-line:not(.sample-title)::before{content:"· ";color:var(--lime);font-weight:800}
+.sample-receipt{font:12px/1.6 "DM Mono",ui-monospace,monospace;color:var(--muted);border-top:1px solid var(--line);padding-top:var(--s3);margin:var(--s3) 0 0;opacity:0;animation:bb-sample-in .5s ease forwards}
+@keyframes bb-sample-in{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.sample-line,.sample-receipt{opacity:1;animation:none}}
+
+/* How it uses Otari */
+.otari-card{display:grid;gap:var(--s4);box-shadow:0 18px 44px rgba(0,0,0,.26)}
+.otari-diagram{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.otari-node{display:inline-flex;align-items:center;gap:var(--s2);border:1px solid var(--line-strong);border-radius:999px;padding:var(--s2) var(--s3);font-weight:700;font-size:14px;background:var(--field)}
+.otari-node-main{border-color:rgba(197,243,107,.55);color:var(--lime)}
+.otari-arrow{color:var(--muted);font-weight:800}
+.otari-node.mono{font:13px/1.4 "DM Mono",ui-monospace,monospace;font-weight:400;color:var(--ink-2)}
+.otari-node.mono small{color:var(--muted);font-size:12px}
+.otari-table{width:100%;border-collapse:collapse}
+.otari-table th,.otari-table td{text-align:left;padding:var(--s3);border-top:1px solid var(--line);font-size:15px;vertical-align:top}
+.otari-table th{font:700 13px/1.4 "DM Mono",ui-monospace,monospace;color:var(--lime);width:34%}
+.otari-table td{color:var(--ink-2)}
+@media(max-width:640px){.otari-table th{display:block;width:auto;border-top:0;padding-bottom:var(--s1)}.otari-table td{display:block;padding-top:0}.otari-table tr{display:block;border-top:1px solid var(--line);padding:var(--s2) 0}.otari-table td{border-top:0}}
+
+/* Soft finish */
+.card,.hero-card{box-shadow:0 18px 44px rgba(0,0,0,.22)}
+/* Technical details in mono */
+#assistant-status,.preview-status,.voice-note{font:13px/1.6 "DM Mono",ui-monospace,monospace}

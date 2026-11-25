@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./assistant.css">
   <script type="module" src="./app.js"></script>
   <script type="module" src="./site.js"></script>
+  <script type="module" src="./hero-sample.js"></script>
   <script type="module" src="./brief-handoff-ui.js"></script>
 </head>
 <body>
@@ -23,6 +24,7 @@
         <a href="#assistant">Assistant</a>
         <a href="#workspace">Builder</a>
         <a href="#saved-library">Saved</a>
+      <a href="#otari">Otari</a>
       </nav>
     </div>
   </header>
@@ -34,20 +36,14 @@
         <h1>Turn a rough idea into a <em>clear brief.</em></h1>
         <p class="lede">Describe your project in plain words. BriefBridge shapes it into a brief your team or client can review, save and share.</p>
         <div class="actions">
-          <a class="button button-primary" href="#assistant">Start with AI</a>
+          <a class="button button-primary" href="#assistant">Try BriefBridge →</a>
           <a class="button button-outline" href="#workspace">Fill it in myself</a>
         </div>
         <p class="hero-note">The brief builder works without an AI key.</p>
       </div>
-      <div class="hero-card" aria-hidden="true">
-        <div class="hero-card-top"><span>Brief 001</span><span class="tag">Ready</span></div>
-        <h2>Bakery logo and website</h2>
-        <dl>
-          <div><dt>Objective</dt><dd>Launch a simple online presence</dd></div>
-          <div><dt>Deliverables</dt><dd>Logo, one-page website</dd></div>
-          <div><dt>Timeline</dt><dd>3 weeks</dd></div>
-          <div><dt>Budget</dt><dd>About $300</dd></div>
-        </dl>
+      <div class="hero-card" aria-label="Sample brief produced by BriefBridge">
+        <div class="hero-card-top"><span>Sample</span><span class="tag">Demo</span></div>
+        <div class="sample-lines" id="sample-lines"></div>
       </div>
     </section>
 
@@ -58,6 +54,33 @@
         <li><span class="step-num">2</span><div><strong>Describe your project</strong><p>Chat or type the details.</p></div></li>
         <li><span class="step-num">3</span><div><strong>Review and save</strong><p>Check, save, export or read your brief.</p></div></li>
       </ol>
+    </section>
+
+    <section class="container section" id="otari" aria-labelledby="otari-heading">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Under the hood</p>
+          <h2 id="otari-heading" class="section-title">How it uses Otari</h2>
+          <p class="section-lede">Your key, one provider, real calls.</p>
+        </div>
+      </div>
+      <div class="card otari-card">
+        <div class="otari-diagram" aria-label="BriefBridge calls the Otari router, which runs the model">
+          <span class="otari-node">BriefBridge</span>
+          <span class="otari-arrow" aria-hidden="true">→</span>
+          <span class="otari-node otari-node-main">Otari</span>
+          <span class="otari-arrow" aria-hidden="true">→</span>
+          <span class="otari-node mono">ling-3.0-flash-vl <small>(auto-picked)</small></span>
+        </div>
+        <table class="otari-table">
+          <tbody>
+            <tr><th scope="row">/chat/completions</th><td>Replies and brief drafting.</td></tr>
+            <tr><th scope="row">/models</th><td>Fills the chat model dropdown.</td></tr>
+            <tr><th scope="row">/audio/speech</th><td>Optional Otari voice for Read aloud.</td></tr>
+            <tr><th scope="row">Your key</th><td>Stored in this browser only.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section id="assistant" class="band" aria-labelledby="assistant-heading">
