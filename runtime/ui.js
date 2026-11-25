@@ -195,9 +195,18 @@ fieldset.ns-w-row{min-width:0;margin:0;padding:0;border:0}
 .ns-msg{max-width:85%;padding:8px 12px;border-radius:var(--ns-radius,12px);white-space:pre-wrap;line-height:1.4}
 .ns-msg.user{align-self:flex-end;background:var(--ns-user-bg,var(--ns-primary,#2563eb));color:var(--ns-user-fg,#fff)}
 .ns-msg.bot{align-self:flex-start;background:var(--ns-msgbg,#f1f3f5)}
-.ns-turn-status{display:flex;align-items:center;gap:8px;max-width:min(85%,680px);min-width:0;white-space:normal;color:var(--ns-muted,#666)}
+.ns-turn-status{display:flex;flex-direction:column;align-items:flex-start;gap:8px;max-width:min(85%,680px);min-width:0;white-space:normal;color:var(--ns-muted,#666)}
 .ns-turn-status-spinner{width:12px;height:12px;flex:0 0 12px;border:2px solid var(--ns-primary,#2563eb);border-top-color:transparent;border-radius:50%;animation:ns-spin .8s linear infinite}
 .ns-turn-status-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.ns-steps{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.ns-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ns-muted,#666)}
+.ns-step::before{content:"";width:14px;height:14px;flex:0 0 14px;border-radius:50%;border:2px solid currentColor;opacity:.35}
+.ns-step.done{opacity:.8}
+.ns-step.done::before{content:"✓";border-color:var(--ns-primary,#2563eb);color:var(--ns-primary,#2563eb);font-size:10px;display:grid;place-items:center;opacity:1}
+.ns-step.active{color:var(--ns-fg,#222)}
+.ns-step.active::before{border-color:var(--ns-primary,#2563eb);border-top-color:transparent;opacity:1;animation:ns-spin .8s linear infinite}
+.ns-receipt{font:11px/1.6 "DM Mono",ui-monospace,monospace;color:var(--ns-muted,#666);max-width:85%;margin:-4px 0 2px}
+@media(prefers-reduced-motion:reduce){.ns-step.active::before{animation:none}}
 .ns-inputbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-top:1px solid var(--ns-border,#e2e2e2)}
 .ns-inputbar .ns-input{flex:1 1 220px;min-width:0;padding:8px 10px;border:1px solid var(--ns-border,#ccc);border-radius:8px;font:inherit;font-size:14px;line-height:1.45;resize:none;overflow-y:auto;max-height:9.5em;white-space:pre-wrap;overflow-wrap:anywhere}
 .ns-inputbar button{padding:8px 16px;background:var(--ns-primary,#2563eb);color:#fff;border:0;border-radius:8px;cursor:pointer;font-weight:600}
@@ -511,6 +520,7 @@ export function mountApp(root, { engine, trace, manifest }) {
   // --- transient turn status + generative UI (CRUSE widgets) -----------------
   let currentBot = null;
   let turnStatus = null;
+  let turnStage = -1;
   const turnStatusController = createTurnStatusController({
     show(text, event) {
       if (!turnStatus) {
@@ -519,14 +529,28 @@ export function mountApp(root, { engine, trace, manifest }) {
         turnStatus.setAttribute("role", "status");
         turnStatus.setAttribute("aria-live", "polite");
         turnStatus.setAttribute("aria-atomic", "true");
-        const spinner = document.createElement("span");
-        spinner.className = "ns-turn-status-spinner";
-        spinner.setAttribute("aria-hidden", "true");
+        const steps = document.createElement("ol");
+        steps.className = "ns-steps";
+        for (const [key, label] of [["read", "Reading your request"], ["call", "Calling the model"], ["write", "Writing the brief"]]) {
+          const step = document.createElement("li");
+          step.className = "ns-step";
+          step.dataset.step = key;
+          step.textContent = label;
+          steps.append(step);
+        }
         const copy = document.createElement("span");
         copy.className = "ns-turn-status-text";
-        turnStatus.append(spinner, copy);
+        turnStatus.append(steps, copy);
         msgs.appendChild(turnStatus);
       }
+      const nextStage = event.type === "turn.started" ? 0
+        : event.type === "agent.completed" || event.type === "turn.completed" ? 2
+        : 1;
+      turnStage = Math.max(turnStage, nextStage);
+      turnStatus.querySelectorAll(".ns-step").forEach((step, i) => {
+        step.classList.toggle("done", i < turnStage);
+        step.classList.toggle("active", i === turnStage);
+      });
       turnStatus.dataset.statusType = event.type;
       turnStatus.querySelector(".ns-turn-status-text").textContent = text;
       msgs.scrollTop = msgs.scrollHeight;
@@ -534,6 +558,7 @@ export function mountApp(root, { engine, trace, manifest }) {
     hide() {
       turnStatus?.remove();
       turnStatus = null;
+      turnStage = -1;
     },
   });
   let validateConfiguredModel = async () => true;
@@ -578,6 +603,13 @@ export function mountApp(root, { engine, trace, manifest }) {
     fitInput();
     addBubble(msgs, "user", text);
     currentBot = null;
+    const turnLlmClients = () => {
+      const list = [engine.top?.llm];
+      for (const s of engine.registry?.cache?.values() || []) list.push(s.llm);
+      return list.filter(Boolean);
+    };
+    const callMark = new Map(turnLlmClients().map(l => [l, l.calls?.length || 0]));
+    const turnStartedAt = performance.now();
     const stream = engine.streamTurn(text, { interaction, slyData: { backend_token: "demo-customer-token-123" } });
     activeTurnStream = stream;
     setTurnInputState(true);
@@ -596,6 +628,13 @@ export function mountApp(root, { engine, trace, manifest }) {
       renderMarkdown(currentBot, clean);
       if (!clean) currentBot.remove();
       renderPresentation(msgs, result.presentation, runUserTurn, result.turnId);
+      const receiptLine = buildTurnReceipt(turnLlmClients(), callMark, performance.now() - turnStartedAt);
+      if (receiptLine) {
+        const receipt = document.createElement("div");
+        receipt.className = "ns-receipt";
+        receipt.textContent = receiptLine;
+        msgs.append(receipt);
+      }
       requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
     } catch (err) {
       turnStatusController.clear();
@@ -1422,6 +1461,29 @@ export function mountApp(root, { engine, trace, manifest }) {
     const welcome = renderWidget(msgs, { ...manifest.welcome.widget, id: "welcome" }, runUserTurn, "welcome");
     welcome.dataset.welcome = "true";
   }
+}
+
+// One monospace line of real call metadata under each reply. Anything the
+// provider did not return (tokens, request id, provider name) is left out.
+function buildTurnReceipt(llms, from, ms) {
+  const calls = [];
+  for (const llm of llms || []) {
+    if (!llm || !Array.isArray(llm.calls)) continue;
+    calls.push(...llm.calls.slice(from.get(llm) || 0));
+  }
+  const real = calls.filter(c => c && !c.mock);
+  if (!real.length) return "";
+  const realCalls = real;
+  const last = realCalls[realCalls.length - 1];
+  const parts = [];
+  if (last.model) parts.push(last.model);
+  if (last.provider || last.routerHost) parts.push(last.provider || last.routerHost);
+  parts.push(`${(ms / 1000).toFixed(1)}s`);
+  const tokens = realCalls.reduce((sum, c) => sum + (Number(c.usage?.total_tokens) || 0), 0);
+  if (tokens) parts.push(`${tokens.toLocaleString()} tokens`);
+  const req = realCalls.map(c => c.requestId).find(Boolean);
+  if (req) parts.push(`req ${req}`);
+  return parts.join(" \u00b7 ");
 }
 
 function addBubble(msgs, cls, text) {

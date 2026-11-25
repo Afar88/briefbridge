@@ -56,6 +56,8 @@ export class LlmClient {
     this.apiKey = apiKey || "";
     this.trace = trace;
     this.mock = !!mock;
+    // Recent real model calls, for the per-reply receipt line.
+    this.calls = [];
   }
 
   // messages: [{role, content, tool_calls?, tool_call_id?, name?}]
@@ -119,6 +121,7 @@ export class LlmClient {
       if (hostOf(this.baseUrl) === "api.anthropic.com") {
         headers["anthropic-dangerous-direct-browser-access"] = "true";
       }
+      const startedAt = performance.now();
       const resp = await fetch(`${this.baseUrl}/chat/completions`, {
         method: "POST",
         headers,
@@ -131,8 +134,20 @@ export class LlmClient {
       }
 
       const routeKind = resp.headers.get("X-Nsdeploy-LLM-Route") || "";
+      const reqIdHeader = resp.headers.get("x-request-id");
+      const providerHeader = resp.headers.get("x-provider");
       const result = await this._readSse(resp, onContentDelta, span, signal);
       const respMock = isMockResponse(this.mock, routeKind, result.model);
+      this.calls.push({
+        model: result.model || model,
+        routerHost: hostOf(this.baseUrl),
+        usage: result.usage || null,
+        requestId: result.requestId || reqIdHeader || null,
+        provider: providerHeader || null,
+        ms: Math.round(performance.now() - startedAt),
+        mock: respMock,
+      });
+      if (this.calls.length > 20) this.calls.splice(0, this.calls.length - 20);
       this.trace?.end(span, {
         finishReason: result.finishReason,
         contentChars: result.content.length,
@@ -170,8 +185,10 @@ export class LlmClient {
     let finishReason = null;
     let usage = null;
     let model = null;
+    let requestId = null;
 
     const handleChunk = (json) => {
+      if (json.id) requestId = json.id;
       if (json.model) model = json.model;
       if (json.usage) usage = json.usage;
       const choice = json.choices?.[0];
@@ -220,6 +237,6 @@ export class LlmClient {
       signal?.removeEventListener("abort", cancel);
     }
 
-    return { content, toolCalls: toolCalls.filter(Boolean), finishReason, usage, model };
+    return { content, toolCalls: toolCalls.filter(Boolean), finishReason, usage, model, requestId };
   }
 }

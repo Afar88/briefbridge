@@ -94,7 +94,7 @@ Netlify and Vercel configuration files are retained as secondary hosting fallbac
 - `site-actions.js`: registers the page's read/save/delete operations with the runtime.
 - `read-aloud.js`: Read aloud for the brief and assistant replies. Uses the browser voice by default; the opt-in Otari voice falls back to it.
 - `site.js`: boots the browser runtime and presents human confirmation before save/delete actions.
-- `runtime/`: browser runtime files from [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web), under the included Apache-2.0 runtime license. BriefBridge changes one file, `runtime/ui.js`: the chat box is a growing text area (Enter sends, Shift+Enter adds a line). All other runtime files are unchanged.
+- `runtime/`: browser runtime files from [cognizant-ai-labs/agentic-web](https://github.com/cognizant-ai-labs/agentic-web), under the included Apache-2.0 runtime license. BriefBridge changes two files. `runtime/ui.js` is our ongoing file: the chat box is a growing text area (Enter sends, Shift+Enter adds a line), replies get a monospace receipt line (model, provider host, seconds, and tokens or request ID only when the provider returns them), and the working state is a ticking step list. `runtime/llm.js` captures each real call's model, usage, request ID and duration to feed those receipts; no values are invented — absent fields are simply hidden. All other runtime files are unchanged.
 - `scripts/check-network.mjs`: validates the published network and required files.
 - `scripts/smoke-live.mjs`: checks the live public site, discovery endpoints, CORS and sandbox headers.
 - `scripts/serve.mjs`: local static server with the CORS and worker headers needed for interoperability checks.
