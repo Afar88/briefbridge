@@ -318,6 +318,7 @@
     let requestRunning = false;
     let observer = null;
     let hideTimer = null;
+    let startupTimer = null;
     function drawProgress(stage) {
       progressList.replaceChildren(...steps.map((label, index) => {
         const state = index < stage ? "is-done" : index === stage ? "is-active" : "is-todo";
@@ -330,6 +331,7 @@
       requestRunning = false;
       if (observer) observer.disconnect();
       if (hideTimer) clearTimeout(hideTimer);
+      if (startupTimer) clearTimeout(startupTimer);
       drawProgress(3);
       updateStatus(statusSource?.textContent || "Ready");
       hideTimer = window.setTimeout(() => { progress.hidden = true; }, 850);
@@ -339,14 +341,20 @@
       if (!messages || !requestRunning) return;
       const loading = $(".ns-turn-status", messages);
       const replies = $$(".ns-msg.bot", messages).filter(node => !node.classList.contains("ns-turn-status") && (node.innerText || node.textContent || "").trim());
-      if (loading) drawProgress(1);
-      else if (replies.length > baseline) stopProgress();
+      if (loading) {
+        const runtimeSteps = Array.from(loading.querySelectorAll(".ns-step"));
+        const activeStep = runtimeSteps.findIndex(step => step.classList.contains("active"));
+        const completedSteps = runtimeSteps.filter(step => step.classList.contains("done")).length;
+        drawProgress(activeStep >= 0 ? activeStep : completedSteps);
+      } else if (replies.length > baseline) stopProgress();
     }
     function startProgress() {
+      if (requestRunning) return;
       const input = $("#ns-input");
       if (!input || !input.value.trim()) return;
       if (hideTimer) clearTimeout(hideTimer);
-      baseline = $$(".ns-msg.bot", $("#ns-msgs") || document).filter(node => !node.classList.contains("ns-turn-status") && (node.innerText || node.textContent || "").trim()).length;
+      if (startupTimer) clearTimeout(startupTimer);
+      baseline = $(".ns-msg.bot", $("#ns-msgs") || document).filter(node => !node.classList.contains("ns-turn-status") && (node.innerText || node.textContent || "").trim()).length;
       requestRunning = true;
       progress.hidden = false;
       drawProgress(0);
@@ -358,6 +366,19 @@
         observer = new MutationObserver(inspectMessages);
         observer.observe(messages, { childList: true, subtree: true, characterData: true });
       }
+      startupTimer = window.setTimeout(() => {
+        const sendButton = $("#ns-send");
+        if (requestRunning && sendButton?.textContent.trim() === "Send" && !$(".ns-turn-status", messages || document)) {
+          stopProgress();
+          showToast("The request could not start. Check your AI settings.", "error");
+        }
+      }, 4000);
+    }
+    const sendButton = $("#ns-send");
+    if (sendButton) {
+      new MutationObserver(() => {
+        if (requestRunning && sendButton.textContent.trim() === "Send" && !$(".ns-turn-status", $("#ns-msgs") || document)) stopProgress();
+      }).observe(sendButton, { childList: true, subtree: true, characterData: true });
     }
     document.addEventListener("click", event => {
       if (event.target.closest?.("#ns-send, .ns-send")) startProgress();
