@@ -187,9 +187,9 @@
     thought.append(make("span", "bb-thought-copy"), make("span", "bb-thought-dot bb-thought-dot-one"), make("span", "bb-thought-dot bb-thought-dot-two"));
     const lines = isShopStart
       ? [
-          "Hi, I'm Penny! I help your shop get ready to sell.",
-          "Tell me about your shop, and I'll polish it for you.",
-          "Watch each step, then see your shop's new look.",
+          "Hi, I'm Penny! I help plan your shop's website.",
+          "Tell me about your shop, and I'll shape a clear website brief.",
+          "Watch each step, then review your website brief.",
         ]
       : [
           "Hi, I'm Chief! I turn long requests into clear briefs.",
