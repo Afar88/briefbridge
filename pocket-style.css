@@ -154,3 +154,4 @@ button, input, select, textarea { font: inherit; }
 .skip-link { background: var(--bb-lime) !important; color: #14200f !important; }
 .bb-screen .handoff-step.is-failed .handoff-dot { border-color: #e8ae55 !important; }
 @keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(197, 243, 107, .18); } }
+.bb-screen #agent-app .ns-hint.warn { color: var(--bb-muted) !important; }
