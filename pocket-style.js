@@ -244,6 +244,14 @@
     if (kind === "success") toastTimer = window.setTimeout(() => { toast.remove(); lastToastKey = ""; }, 4000);
   }
 
+  if (statusSource) {
+    const readStatusAlert = () => {
+      const message = statusSource.textContent.trim();
+      if (/could not start|failed|error|offline/i.test(message)) showToast(message, "error");
+    };
+    new MutationObserver(readStatusAlert).observe(statusSource, { childList: true, characterData: true, subtree: true });
+  }
+
   if (!isShopStart) {
     const notice = $("#form-notice");
     if (notice) {
