@@ -319,6 +319,7 @@
     let observer = null;
     let hideTimer = null;
     let startupTimer = null;
+    let sendObserver = null;
     function drawProgress(stage) {
       progressList.replaceChildren(...steps.map((label, index) => {
         const state = index < stage ? "is-done" : index === stage ? "is-active" : "is-todo";
@@ -332,6 +333,7 @@
       if (observer) observer.disconnect();
       if (hideTimer) clearTimeout(hideTimer);
       if (startupTimer) clearTimeout(startupTimer);
+      if (sendObserver) sendObserver.disconnect();
       drawProgress(3);
       updateStatus(statusSource?.textContent || "Ready");
       hideTimer = window.setTimeout(() => { progress.hidden = true; }, 850);
@@ -351,6 +353,7 @@
     function startProgress() {
       if (requestRunning) return;
       const input = $("#ns-input");
+      const sendButton = $("#ns-send");
       if (!input || !input.value.trim()) return;
       if (hideTimer) clearTimeout(hideTimer);
       if (startupTimer) clearTimeout(startupTimer);
@@ -366,19 +369,19 @@
         observer = new MutationObserver(inspectMessages);
         observer.observe(messages, { childList: true, subtree: true, characterData: true });
       }
+      if (sendObserver) sendObserver.disconnect();
+      if (sendButton) {
+        sendObserver = new MutationObserver(() => {
+          if (requestRunning && sendButton.textContent.trim() === "Send" && !$(".ns-turn-status", messages || document)) stopProgress();
+        });
+        sendObserver.observe(sendButton, { childList: true, subtree: true, characterData: true });
+      }
       startupTimer = window.setTimeout(() => {
-        const sendButton = $("#ns-send");
         if (requestRunning && sendButton?.textContent.trim() === "Send" && !$(".ns-turn-status", messages || document)) {
           stopProgress();
           showToast("The request could not start. Check your AI settings.", "error");
         }
       }, 4000);
-    }
-    const sendButton = $("#ns-send");
-    if (sendButton) {
-      new MutationObserver(() => {
-        if (requestRunning && sendButton.textContent.trim() === "Send" && !$(".ns-turn-status", $("#ns-msgs") || document)) stopProgress();
-      }).observe(sendButton, { childList: true, subtree: true, characterData: true });
     }
     document.addEventListener("click", event => {
       if (event.target.closest?.("#ns-send, .ns-send")) startProgress();
