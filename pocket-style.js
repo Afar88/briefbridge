@@ -128,18 +128,26 @@
   if (statusSource) new MutationObserver(refreshStatus).observe(statusSource, { childList: true, characterData: true, subtree: true });
 
   /* Small info buttons replace low-priority helper copy. */
-  const infoTargets = $$(".hero-note, .fine-print, .settings-tip, .section-lede, .field small");
   const infoButtons = [];
-  for (const source of infoTargets) {
+  function convertInfoSource(source) {
+    if (!source || source.dataset.bbInfoReady === "true") return;
     const message = (source.textContent || "").trim();
-    if (!message) continue;
+    if (!message) return;
     const button = make("button", "bb-info-trigger", "i");
     button.type = "button";
     button.setAttribute("aria-label", "More information");
     button.setAttribute("aria-expanded", "false");
     button.dataset.info = message;
+    source.dataset.bbInfoReady = "true";
     source.replaceWith(button);
     infoButtons.push(button);
+  }
+  $(".hero-note, .fine-print, .settings-tip, .section-lede, .field small").forEach(convertInfoSource);
+  const agentAppForInfo = $("#agent-app");
+  if (agentAppForInfo) {
+    const convertRuntimeHints = () => $(".ns-hint", agentAppForInfo).forEach(convertInfoSource);
+    convertRuntimeHints();
+    new MutationObserver(convertRuntimeHints).observe(agentAppForInfo, { childList: true, subtree: true });
   }
   const infoCard = make("div", "bb-info-card");
   infoCard.hidden = true;
