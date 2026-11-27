@@ -142,10 +142,10 @@
     source.replaceWith(button);
     infoButtons.push(button);
   }
-  $(".hero-note, .fine-print, .settings-tip, .section-lede, .field small").forEach(convertInfoSource);
+  $$(".hero-note, .fine-print, .settings-tip, .section-lede, .field small").forEach(convertInfoSource);
   const agentAppForInfo = $("#agent-app");
   if (agentAppForInfo) {
-    const convertRuntimeHints = () => $(".ns-hint", agentAppForInfo).forEach(convertInfoSource);
+    const convertRuntimeHints = () => $$(".ns-hint", agentAppForInfo).forEach(convertInfoSource);
     convertRuntimeHints();
     new MutationObserver(convertRuntimeHints).observe(agentAppForInfo, { childList: true, subtree: true });
   }
